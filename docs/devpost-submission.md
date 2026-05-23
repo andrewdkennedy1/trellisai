@@ -14,7 +14,7 @@ https://trellisai.andrewdkennedy1.workers.dev
 
 ## Demo Video
 
-TODO: demo recording URL
+https://youtu.be/pfQCDaUZ0Qg
 
 ## Repository
 
@@ -62,6 +62,7 @@ Next steps are weather API integration, richer grower approval flows, photo-base
 - Google Cloud Build
 - Google Artifact Registry
 - Google Secret Manager
+- Google Cloud Text-to-Speech
 - Gemini / Google Gen AI SDK
 - MongoDB Atlas
 - MongoDB MCP Server

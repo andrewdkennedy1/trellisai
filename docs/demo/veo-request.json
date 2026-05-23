@@ -1,0 +1,18 @@
+{
+  "instances": [
+    {
+      "prompt": "A clean cinematic 4-second product intro for TrellisAI, an AI farm operations agent. Start over stylized green agricultural field rows at sunrise. Subtle glowing data paths flow through the rows into a modern dashboard-like trellis grid, showing farm memory turning into prioritized field actions. Professional hackathon demo style, no people, no animals, no robot face, no readable text, no logos except abstract trellis leaf/grid symbol, optimistic daylight, crisp and polished."
+    }
+  ],
+  "parameters": {
+    "aspectRatio": "16:9",
+    "durationSeconds": 4,
+    "sampleCount": 1,
+    "generateAudio": false,
+    "enhancePrompt": true,
+    "personGeneration": "dont_allow",
+    "resolution": "720p",
+    "storageUri": "gs://trellisai-veo-demo-699805652725/veo/",
+    "negativePrompt": "text, captions, letters, people, animals, robot face, watermark, blurry, low quality, stock footage look"
+  }
+}
