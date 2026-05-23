@@ -1,32 +1,34 @@
 # TrellisAI Demo Script
 
-1. Open the Cloudflare-hosted TrellisAI app.
-2. Confirm the API status shows API and MongoDB ready.
-3. Save this North Field log:
+1. Start with the 4-second Veo-generated TrellisAI logo and field-row intro.
+2. Open the Cloudflare-hosted TrellisAI app.
+3. Confirm the status shows live farm memory is ready.
+4. Show the Log History panel. It is backed by 75 messy, realistic farm notes.
+5. Save this North Field log:
 
 ```text
 North Field corn has yellowing near the east edge. Irrigated 45 minutes yesterday.
 ```
 
-4. Show the response with structured activities, observations, risk signals, embedding text, and an embedding vector stored in MongoDB.
-5. Save this South Field log:
+6. Show the response with activities, observations, risk signals, and a plain memory summary.
+7. Save this South Field log:
 
 ```text
 Aphids are back on soybean leaves near the south road. Leaf curling is worse in the dry corner.
 ```
 
-6. Ask:
+8. Ask:
 
 ```text
 What should I do tomorrow?
 ```
 
-7. Show TrellisAI returning a ranked, field-specific action plan.
-8. Open the recommendations endpoint or database view to show recommendations saved in MongoDB.
-9. Approve a recommendation and show the generated task in the dashboard.
+9. Show the Agent Thread and What Trellis Checked panels: multi-turn messages, what Trellis checked, why it made the plan, and similar past notes.
+10. Show TrellisAI returning a ranked, field-specific action plan.
+11. Approve a recommendation and show the generated task in the dashboard.
 
 Core success criteria:
 
 ```text
-messy log -> MongoDB memory -> action plan -> saved recommendation -> approved task
+messy log -> farm memory -> similar past notes -> tomorrow's plan -> approved field job
 ```

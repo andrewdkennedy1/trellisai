@@ -1,6 +1,7 @@
-import type { Db } from "mongodb";
+import { ObjectId, type Db } from "mongodb";
 import type { Priority, Recommendation } from "../types.js";
 import { aggregateFarmRisks } from "../tools/aggregateFarmRisks.js";
+import { retrieveFarmMemory } from "../tools/retrieveFarmMemory.js";
 
 export async function generateDailyPlan(db: Db, farmId: string, targetDate = tomorrowIsoDate()) {
   const [riskRows, openTasks] = await Promise.all([
@@ -11,11 +12,17 @@ export async function generateDailyPlan(db: Db, farmId: string, targetDate = tom
     }).sort({ priority: 1, due_date: 1 }).limit(20).toArray()
   ]);
 
+  const memoryQuery = riskRows.length
+    ? riskRows.map((row) => `${row._id.field_name}: ${row.risks.map((risk: any) => risk.signal).join(", ")}`).join("; ")
+    : "recent farm risks, crop stress, irrigation, pests, labor, and tomorrow's farm plan";
+  const memoryMatches = await retrieveFarmMemory(db, farmId, memoryQuery, 3);
+
   const recommendations: Recommendation[] = riskRows.map((item, index) => {
     const topRisk = item.risks[0];
     const priority: Priority = index === 0 || item.risk_score >= 4 ? "high" : "medium";
 
     return {
+      _id: new ObjectId(),
       farm_id: farmId,
       field_id: item._id.field_id,
       field_name: item._id.field_name,
@@ -32,6 +39,7 @@ export async function generateDailyPlan(db: Db, farmId: string, targetDate = tom
 
   if (openTasks.length) {
     recommendations.push({
+      _id: new ObjectId(),
       farm_id: farmId,
       field_id: String(openTasks[0].field_id),
       field_name: openTasks[0].field_name,
@@ -51,6 +59,7 @@ export async function generateDailyPlan(db: Db, farmId: string, targetDate = tom
     const field = await db.collection("fields").findOne({ farm_id: farmId, status: "active" });
     if (field) {
       recommendations.push({
+        _id: new ObjectId(),
         farm_id: farmId,
         field_id: String(field._id),
         field_name: field.name,
@@ -74,6 +83,58 @@ export async function generateDailyPlan(db: Db, farmId: string, targetDate = tom
   return {
     answer: "Here is tomorrow's TrellisAI action plan.",
     target_date: targetDate,
+    reasoning_summary: [
+      riskRows[0]
+        ? `${riskRows[0]._id.field_name} has the strongest current signal cluster with a score of ${riskRows[0].risk_score}.`
+        : "No high-confidence field risk cluster was found, so the agent falls back to freshness scouting.",
+      memoryMatches[0]
+        ? `The closest farm-memory match is from ${memoryMatches[0].field_name} on ${memoryMatches[0].date}.`
+        : "No prior vector-memory match was available.",
+      openTasks.length
+        ? `${openTasks.length} open task(s) are already in MongoDB and were considered before creating new work.`
+        : "No open tasks blocked the plan."
+    ],
+    tool_calls: [
+      {
+        name: "aggregateFarmRisks",
+        system: "MongoDB aggregation",
+        result: `${riskRows.length} field risk group(s) ranked`
+      },
+      {
+        name: "retrieveFarmMemory",
+        system: "MongoDB Vector Search",
+        result: `${memoryMatches.length} memory match(es) returned`
+      },
+      {
+        name: "findOpenTasks",
+        system: "MongoDB find",
+        result: `${openTasks.length} open task(s) found`
+      },
+      {
+        name: "saveRecommendations",
+        system: "MongoDB insertMany",
+        result: `${recommendations.length} recommendation(s) saved`
+      }
+    ],
+    agent_trace: [
+      {
+        step: "Perceive",
+        detail: "Read recent farm logs, open tasks, and field risk signals."
+      },
+      {
+        step: "Remember",
+        detail: "Embedded the planning query with a Google embedding model and searched MongoDB vector memory."
+      },
+      {
+        step: "Use tools",
+        detail: "Ran MongoDB aggregations plus farm-memory retrieval before writing recommendations."
+      },
+      {
+        step: "Act",
+        detail: "Saved ranked recommendations that can be approved into field tasks."
+      }
+    ],
+    memory_matches: memoryMatches,
     recommendations,
     open_tasks: openTasks
   };

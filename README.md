@@ -5,15 +5,17 @@ TrellisAI is a MongoDB-powered farm operations agent that turns daily farm logs 
 ## Architecture
 
 - `apps/api`: Cloud Run-ready TypeScript API for farm logs, field history, tasks, recommendations, Gemini extraction, embeddings, and MongoDB persistence.
+- `apps/agent`: Google Cloud Agent Platform Runtime wrapper exposing TrellisAI planning, log history, save-log, and approval tools.
 - `apps/worker`: Cloudflare Worker public app and gateway to the Cloud Run API.
 - `infra/mongodb`: seed data, MongoDB indexes, vector index definition, and MongoDB MCP server config.
 - `infra/gcloud`: bootstrap and deploy scripts for Google Cloud Run.
 - `docs`: architecture, demo script, and Devpost submission copy.
+- `docs/demo`: logo, screenshots, Veo intro clip, TTS voiceover, and final narrated demo video assets.
 
 The runtime path is:
 
 ```text
-Cloudflare Worker -> Cloud Run API -> Gemini + MongoDB Atlas -> MongoDB MCP tool layer
+Cloudflare Worker -> Agent Platform Runtime -> Cloud Run tool API -> Gemini + MongoDB Atlas -> MongoDB MCP tool layer
 ```
 
 ## Local Development
@@ -78,4 +80,6 @@ Current demo deployment:
 
 - Public app: https://trellisai.andrewdkennedy1.workers.dev
 - Cloud Run API: https://trellisai-api-699805652725.us-central1.run.app
+- Agent Platform Runtime: `projects/699805652725/locations/us-central1/reasoningEngines/9126389063970979840`
+- Demo video backup: https://storage.googleapis.com/trellisai-veo-demo-699805652725/demo/trellisai-demo-voiceover.mp4
 - Google Cloud project used for deployment: `shibeai`

@@ -16,7 +16,7 @@ const CreateLogSchema = z.object({
 logsRouter.get("/", asyncHandler(async (req, res) => {
   const farmId = String(req.query.farm_id || "farm_demo");
   const db = await getDb();
-  const logs = await db.collection("logs").find({ farm_id: farmId }).sort({ date: -1 }).limit(50).toArray();
+  const logs = await db.collection("logs").find({ farm_id: farmId }).sort({ date: -1 }).limit(100).toArray();
   res.json({ logs });
 }));
 

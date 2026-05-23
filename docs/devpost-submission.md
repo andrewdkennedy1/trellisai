@@ -14,7 +14,7 @@ https://trellisai.andrewdkennedy1.workers.dev
 
 ## Demo Video
 
-https://youtu.be/pfQCDaUZ0Qg
+https://youtu.be/EE6EDAMAjEI
 
 ## Repository
 
@@ -38,7 +38,7 @@ MongoDB Atlas is TrellisAI's persistent farm memory layer. We store raw logs, st
 
 ## Google Cloud / Gemini Use
 
-TrellisAI is built around a Gemini on Vertex AI extraction and planning loop. Gemini turns messy farm notes into strict structured JSON that the backend stores in MongoDB. The Cloud Run API hosts the agent workflow, uses the Cloud Run service account for Vertex AI, and keeps MongoDB credentials in Google Cloud Secret Manager instead of the public Worker.
+TrellisAI uses Google Cloud Agent Platform Runtime for the farm-operations agent wrapper, Gemini on Vertex AI for extraction and planning, Google embedding models for farm-memory vectors, Cloud Run for the tool API, Secret Manager for credentials, Cloud Text-to-Speech for the narrated demo, and Veo 3.1 on Vertex AI for the generated demo intro. The deployed Agent Platform Reasoning Engine calls TrellisAI tools for log history, daily planning, MongoDB vector-memory retrieval, and recommendation approval.
 
 ## Challenges
 
@@ -59,10 +59,13 @@ Next steps are weather API integration, richer grower approval flows, photo-base
 ## Built With
 
 - Google Cloud Run
+- Google Cloud Agent Platform Runtime
 - Google Cloud Build
 - Google Artifact Registry
 - Google Secret Manager
 - Google Cloud Text-to-Speech
+- Vertex AI Veo 3.1
+- Cloud Storage
 - Gemini / Google Gen AI SDK
 - MongoDB Atlas
 - MongoDB MCP Server

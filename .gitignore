@@ -9,4 +9,6 @@ dist/
 .DS_Store
 coverage/
 npm-debug.log*
+__pycache__/
 .chrome-devpost-profile/
+.chrome-video-profile/

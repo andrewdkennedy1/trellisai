@@ -1,6 +1,6 @@
 {
   "input": {
-    "text": "TrellisAI turns daily farm notes into operational memory and a clear plan for tomorrow. A farmer starts with a messy field log: yellowing corn, irrigation, pests, labor, weather, or equipment delays. Gemini extracts structured activities, observations, risk signals, and embedding text. MongoDB stores the raw log, field history, recommendations, tasks, and vector-ready memory in one place. When the grower asks what should I do tomorrow, the agent queries MongoDB history, aggregates current risk signals, and returns prioritized field-specific recommendations. The public app runs on Cloudflare Workers, the backend runs on Google Cloud Run, and the agent story uses MongoDB MCP as the farm-memory tool layer.\r\n"
+    "text": "TrellisAI is an AI farm assistant that turns everyday field notes into tomorrow's work plan.\n\nThe demo starts with realistic daily notes: pests, irrigation pressure, crop stress, labor shortages, equipment delays, and weather risk. The log history looks like notes a grower or scout would actually write.\n\nWhen a new scouting note is saved, Trellis pulls out the important field signals and adds them to farm memory.\n\nOn the next turn, the grower asks what to do tomorrow. Trellis shows what it checked: recent field risks, similar past notes, and unfinished jobs.\n\nThe explanation stays short and practical. The grower can approve a plan item, and Trellis turns it into an open field job."
   },
   "voice": {
     "name": "en-US-Chirp3-HD-Achernar",

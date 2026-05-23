@@ -64,44 +64,99 @@ await db.collection("fields").insertMany([
   }
 ]);
 
-const baseLogs = [
-  ["North Field", "Corn has yellowing near the east edge. Irrigated 45 minutes."],
-  ["North Field", "More yellow leaves after yesterday's watering. No pests spotted."],
-  ["North Field", "North Field east edge still pale. Soil is muddy in the low corner."],
-  ["North Field", "Applied light nitrogen test strip on two corn rows."],
-  ["North Field", "Corn color improved in center rows, yellowing remains at the east edge."],
-  ["North Field", "Irrigation ran 35 minutes before sunrise."],
-  ["North Field", "Standing water near east edge after irrigation."],
-  ["North Field", "No new pests in corn. Yellow leaves still visible."],
-  ["North Field", "Scout found pale leaves and shallow roots in sandy section."],
-  ["North Field", "Skipped irrigation because soil was saturated."],
-  ["South Field", "Aphids found on soybean leaves near the south road. Leaf curling on several plants."],
-  ["South Field", "Second aphid sighting this week. Conditions are warm and dry."],
-  ["South Field", "Soybean leaves curling on south road side. No irrigation today."],
-  ["South Field", "Aphids visible on underside of leaves in five sample spots."],
-  ["South Field", "Dry wind all afternoon. Soybean canopy looks stressed."],
-  ["South Field", "Irrigated 30 minutes after dry weather and pest scouting."],
-  ["South Field", "Aphid pressure lower in center rows but still active near road."],
-  ["South Field", "Leaf curling continued on three soybean rows."],
-  ["South Field", "Beneficial insects seen but aphids still above threshold near south edge."],
-  ["South Field", "Warm dry weather forecast for tomorrow."],
-  ["West Field", "Lettuce harvest delayed because tractor maintenance ran long."],
-  ["West Field", "Short crew today; west lettuce harvest slipped another day."],
-  ["West Field", "Cooling trailer was late and harvest start moved to afternoon."],
-  ["West Field", "Equipment delay blocked lettuce pickup near west gate."],
-  ["West Field", "Harvest timing is tight before warm weather arrives."],
-  ["West Field", "Crew finished half the west lettuce block before sunset."],
-  ["West Field", "Tractor maintenance complete but labor shortage remains."],
-  ["West Field", "Lettuce quality looks good; prioritize harvest tomorrow morning."],
-  ["West Field", "Packaging supplies delayed at the loading area."],
-  ["West Field", "Irrigation held to keep lettuce beds firm for harvest."]
-] as const;
+const rawLogPools = {
+  "North Field": [
+    "7:10am corn on the east edge is pale again, almost lemon yellow on the lower leaves. Irrigation ran 42 min last night.",
+    "North corn center rows look ok but east low spot is still wet. Boots picked up mud, no standing water by noon.",
+    "Skipped the planned water set. Soil probe on east edge still reads wet at 8 inches.",
+    "Jose saw shallow roots in the sandy strip near row 14. Leaves pale, no chewing marks.",
+    "Applied a tiny N test strip to rows 11-12 only. Marked stakes with blue tape.",
+    "Corn color improved near the middle pivot track. East edge still behind the rest of the block.",
+    "Irrigation ran 30 min before sunrise because wind was forecast. East low corner might be getting too much.",
+    "No aphids or mites in corn. Yellowing is mostly nutrient/water related from what scout saw.",
+    "Pressure check on north line was uneven, last two sprinklers weak. Need crew to flush tomorrow.",
+    "Fertilizer tank was lower than expected after the last run. Need verify injection rate.",
+    "East edge has yellow leaves plus a little leaf roll by 3pm. Warm afternoon, soil surface crusting.",
+    "Two rows near the ditch are shorter. Could be compaction from last week's tractor pass.",
+    "Morning scout counted no pests. Leaves pale between veins on 6 of 20 sample plants.",
+    "Ran pump 20 min just to test pressure. West half looked fine; east line still sputtered.",
+    "Rain gauge had trace only. We held irrigation because root zone was damp from prior set.",
+    "Corn near row 18 has better color after N strip, but low area still patchy.",
+    "Found a broken riser cap near east edge. Replaced it but soil there is saturated.",
+    "Drone pass showed yellow patch shaped like irrigation pattern, not random pest spread.",
+    "Crew noted fertilizer injector alarm at 6:40am, reset after 10 min. Need check if dose was missed.",
+    "South wind dried the top fast but probe still says wet below. Do not overwater tomorrow.",
+    "North Field smells sour in the low spot, maybe anaerobic. Plants there are stunted.",
+    "Leaf tissue sample bagged from east edge and center rows for comparison.",
+    "Irrigation valve stuck partly open for unknown time. Closed manually at 5pm.",
+    "Corn overall ok but the east edge keeps showing the same yellow stress after every water event.",
+    "Need a decision before more nitrogen: water issue, injector issue, or true deficiency?"
+  ],
+  "South Field": [
+    "Soybeans by south road have leaf curl again. Found aphids under leaves in 4 of 10 checks.",
+    "Warm dry wind all afternoon. South edge looks dusty and stressed, center rows less curled.",
+    "Aphid count above threshold at two sample points near the road. Beneficials present but not enough yet.",
+    "Irrigated 28 min after lunch. Leaves perked up a little but pests still visible.",
+    "Scout text: aphids mostly underside lower canopy, row 6-9. No mildew spotted.",
+    "Second pass this week, leaf curl spreading about 40 ft farther into the block.",
+    "Lady beetles seen in center rows. Hold spray decision until morning count if weather allows.",
+    "South road dust is heavy after trucks. Plants nearest road look worse than interior.",
+    "No irrigation today because pump crew was on North line. Soybeans looked dry by 2pm.",
+    "Aphid pressure lower after cool night but still active on south edge leaves.",
+    "Sampled 20 plants: 7 had aphids, 5 had curling, 2 had both heavy.",
+    "Irrigation filter had sand. Flow may have been low on the south lateral.",
+    "Dry forecast tomorrow and wind from road side. Need scout before heat peak.",
+    "Leaf curl in soybeans could be pest plus dry stress. Pods still forming normally.",
+    "Crew saw ants farming aphids near the ditch. Marked hot spot with orange flag.",
+    "Applied no treatment. Want one more count because beneficial insects are increasing.",
+    "South Field canopy temp felt hotter than North on handheld check. Soil dry at 4 inches.",
+    "Aphids clustered on new growth at south corner. Edge rows need priority.",
+    "Irrigation ran 35 min, but pressure dropped halfway through. Check filter before next set.",
+    "Some leaves have speckling, maybe early mite pressure mixed with aphids.",
+    "Roadside plants still curled at sunset. Center rows recovered after water.",
+    "Scouting note from Maya: count aphids before 10am, hot wind makes them harder to see later.",
+    "Beneficials present: lacewing eggs on 3 plants. Still not enough to ignore the hotspot.",
+    "South lateral #2 has uneven moisture. Could be clogged emitters.",
+    "Need decision tomorrow: spot treat south road edge or wait for beneficials."
+  ],
+  "West Field": [
+    "Lettuce harvest start slipped because the tractor was still in maintenance at 6am.",
+    "Short crew today, only 7 cutters instead of 11. Finished half of west block before heat.",
+    "Cooling trailer arrived 45 min late. Lettuce sat too long at loading area.",
+    "West beds look firm after holding water. Good for harvest if crew is ready early.",
+    "Packaging sleeves delayed, crew waited near west gate for 30 min.",
+    "Harvest quality good in rows 1-12. Outer leaves a little warm after noon.",
+    "Labor lead says two people out tomorrow. Need shift crew from wash station if possible.",
+    "Tractor maintenance complete but forklift battery was low. Charge overnight.",
+    "Irrigation held again to keep beds firm. Watch for wilt if harvest slips.",
+    "Warm weather coming in two days. West lettuce needs priority before quality drops.",
+    "Crew finished rows 13-20 but left north corner because bins ran short.",
+    "Mud near gate slowed trailer turnarounds. Need gravel or alternate pickup route.",
+    "Harvest knives were not all sharpened. Slowed first crew by 20 min.",
+    "West Field looks market-ready. Delay risk is labor and cooling, not crop health.",
+    "Truck appointment changed to 11am. Need harvest start before sunrise.",
+    "Cooling unit alarm at 1pm, reset after filter clean. Monitor tomorrow.",
+    "Rows near west fence have slight tip burn after warm afternoon.",
+    "Crew packed 68 crates, target was 95. Labor shortage remains blocker.",
+    "Irrigation set accidentally ran 12 min on west strip. Beds still mostly firm.",
+    "Pallet jack stuck near loading pad. Equipment delay cost another 15 min.",
+    "Quality check: heads dense, color good, no pest damage in sample crate.",
+    "If we miss tomorrow morning window, warm weather could lower grade.",
+    "Need assign harvest crew, cooling trailer, sleeves, and forklift before 5:30am.",
+    "West gate area congested with fertilizer delivery. Keep harvest route clear.",
+    "Manager note: prioritize lettuce first, then South soybean scouting."
+  ]
+} as const;
+
+const baseLogs = Object.entries(rawLogPools).flatMap(([fieldName, logs]) => {
+  return logs.map((rawText) => [fieldName, rawText] as const);
+});
 
 const start = new Date("2026-04-23T12:00:00Z");
 
 for (const [index, [field_name, raw_text]] of baseLogs.entries()) {
   const date = new Date(start);
-  date.setDate(start.getDate() + index);
+  date.setDate(start.getDate() + Math.floor(index / 3));
   await createFarmLog(db, {
     farm_id: farmId,
     field_name,
