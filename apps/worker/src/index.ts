@@ -430,22 +430,15 @@ function html() {
       box-shadow: 0 0 0 4px rgba(39, 103, 73, 0.12);
     }
 
-    .sample-row, .toolbar-row {
+    .toolbar-row {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
       margin-top: 10px;
     }
 
-    .sample-row button {
-      border: 1px solid #d8decf;
-      border-radius: 8px;
-      background: #f3f7ef;
-      color: #253a2b;
-      padding: 8px 10px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 760;
+    .toolbar-row .primary-action {
+      width: 100%;
     }
 
     .control-grid {
@@ -624,14 +617,14 @@ function html() {
 
     .plan-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 12px;
     }
 
     .plan-card {
       display: grid;
       gap: 10px;
-      min-height: 210px;
+      min-height: 188px;
       padding: 14px;
       background: #fffefa;
     }
@@ -858,7 +851,7 @@ function html() {
     import React, { useEffect, useMemo, useState } from "https://esm.sh/react@18.3.1";
     import { createRoot } from "https://esm.sh/react-dom@18.3.1/client";
     import { AnimatePresence, LayoutGroup, motion } from "https://esm.sh/framer-motion@11.18.2?deps=react@18.3.1";
-    import { Activity, Check, CheckCircle2, ClipboardCheck, Droplets, History, ListChecks, Play, Radio, Send, Sparkles, Sprout, Youtube } from "https://esm.sh/lucide-react@0.468.0?deps=react@18.3.1";
+    import { Activity, Check, CheckCircle2, ClipboardCheck, Droplets, History, ListChecks, Radio, Send, Sparkles, Sprout, Youtube } from "https://esm.sh/lucide-react@0.468.0?deps=react@18.3.1";
 
     const h = React.createElement;
     const demoVideoUrl = "https://www.youtube.com/embed/EE6EDAMAjEI";
@@ -917,7 +910,7 @@ function html() {
       const [fieldName, setFieldName] = useState("South Field");
       const [date, setDate] = useState(todayIso());
       const [rawText, setRawText] = useState(sampleLogs[0].text);
-      const [question, setQuestion] = useState("What should I do tomorrow?");
+      const question = "What should I do tomorrow?";
       const [health, setHealth] = useState(null);
       const [logs, setLogs] = useState([]);
       const [tasks, setTasks] = useState([]);
@@ -968,9 +961,7 @@ function html() {
         });
       }, [tasks]);
 
-      const visibleRecommendations = safeArray(plan && plan.recommendations).length
-        ? safeArray(plan && plan.recommendations)
-        : recommendations.slice(0, 4);
+      const visibleRecommendations = safeArray(plan && plan.recommendations);
 
       async function refreshState() {
         try {
@@ -1046,24 +1037,34 @@ function html() {
         }
       }
 
-      async function approveRecommendation(rec) {
-        const id = compactId(rec && rec._id);
-        if (!id) return;
+      async function approveSuggestedTasks(items) {
+        const pending = safeArray(items).filter(function(rec) {
+          return rec.status !== "approved" && rec.status !== "dismissed" && compactId(rec._id);
+        });
+        if (!pending.length) return;
+
         setError("");
-        setApprovingId(id);
+        setApprovingId("all");
         try {
-          const body = await api("/api/recommendations/" + encodeURIComponent(id) + "/approve", {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({})
-          });
-          const task = body.task && (body.task.task || body.task);
+          const createdTitles = [];
+          for (const rec of pending) {
+            const id = compactId(rec._id);
+            const body = await api("/api/recommendations/" + encodeURIComponent(id) + "/approve", {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({})
+            });
+            const task = body.task && (body.task.task || body.task);
+            if (task && task.title) createdTitles.push(task.title);
+          }
           setTurns(function(current) {
             return [
               {
                 role: "agent",
-                title: "Crew job approved",
-                body: task && task.title ? task.title : "Approved work was added to the field board."
+                title: "Suggested tasks created",
+                body: createdTitles.length
+                  ? createdTitles.slice(0, 3).join("; ")
+                  : "The agent-created tasks were added to the field board."
               }
             ].concat(current).slice(0, 5);
           });
@@ -1085,9 +1086,6 @@ function html() {
           h(AgentStage, {
             plan: plan,
             runState: runState,
-            runAgent: runAgent,
-            question: question,
-            setQuestion: setQuestion,
             openTasks: openTasks,
             logs: logs,
             recommendations: recommendations
@@ -1109,7 +1107,7 @@ function html() {
               setRawText: setRawText,
               samples: sampleLogs,
               useSample: useSample,
-              runAgent: runAgent,
+              submitDailyLog: runAgent,
               runState: runState,
               error: error
             }),
@@ -1124,7 +1122,7 @@ function html() {
             }),
             h(PlanCards, {
               recommendations: visibleRecommendations,
-              approveRecommendation: approveRecommendation,
+              approveSuggestedTasks: approveSuggestedTasks,
               approvingId: approvingId
             }),
             h(LogHistory, { logs: logs })
@@ -1139,10 +1137,10 @@ function html() {
       const headline = plan ? "Trellis is driving tomorrow morning" : "Trellis is ready to run the farm board";
       const answer = plan && plan.answer
         ? plan.answer
-        : "Drop in a messy daily note, then ask what to do. The agent reads it, looks up field history, offers a sprinkler edit, and queues work for approval.";
+        : "Submit a messy daily note. Trellis reads it, looks up field history, offers a sprinkler edit, and queues suggested tasks for approval.";
       const running = props.runState === "saving" || props.runState === "thinking";
-      const runLabel = props.runState === "saving" ? "Saving note" : props.runState === "thinking" ? "Thinking" : "Run Trellis agent";
-      const approvalCount = safeArray(props.recommendations).length;
+      const agentState = props.runState === "saving" ? "reading log" : props.runState === "thinking" ? "planning" : plan ? "plan ready" : "waiting for log";
+      const approvalCount = safeArray(plan && plan.recommendations).length;
       const stats = [
         { label: "Logs", value: safeArray(props.logs).length },
         { label: "Open jobs", value: safeArray(props.openTasks).length },
@@ -1178,29 +1176,11 @@ function html() {
                 transition: { delay: 0.18 }
               }, answer)
             ),
-            h("div", null,
-              h("div", { className: "run-row" },
-                h(motion.button, {
-                  className: "primary-action",
-                  type: "button",
-                  onClick: props.runAgent,
-                  disabled: running,
-                  whileHover: running ? {} : { y: -2, scale: 1.01 },
-                  whileTap: running ? {} : { scale: 0.98 }
-                }, running ? h(Activity, { size: 18 }) : h(Play, { size: 18 }), runLabel),
-                h(motion.label, {
-                  className: "primary-action ghost-action",
-                  whileHover: { y: -2 },
-                  htmlFor: "question"
-                }, h(Send, { size: 17 }), "Ask")
-              ),
-              h("label", { htmlFor: "question", style: { color: "rgba(255,255,255,0.78)" } }, "Agent prompt"),
-              h("input", {
-                id: "question",
-                value: props.question,
-                onChange: function(event) { props.setQuestion(event.target.value); },
-                style: { background: "rgba(255,255,255,0.94)" }
-              })
+            h("div", { className: "run-row" },
+              h("span", { className: "agent-kicker" },
+                running ? h(Activity, { size: 16 }) : h(Sparkles, { size: 16 }),
+                agentState
+              )
             )
           ),
           h("div", { className: "stage-board" },
@@ -1284,6 +1264,11 @@ function html() {
 
     function LogComposer(props) {
       const running = props.runState === "saving" || props.runState === "thinking";
+      const buttonLabel = props.runState === "saving"
+        ? "Saving log"
+        : props.runState === "thinking"
+          ? "Trellis is planning"
+          : "Submit daily log";
       return h(motion.section, {
         className: "panel",
         initial: { opacity: 0, y: 18 },
@@ -1316,26 +1301,28 @@ function html() {
           value: props.rawText,
           onChange: function(event) { props.setRawText(event.target.value); }
         }),
-        h("div", { className: "sample-row" },
-          props.samples.map(function(sample) {
-            return h(motion.button, {
-              key: sample.name,
-              type: "button",
-              onClick: function() { props.useSample(sample); },
-              whileHover: { y: -2 },
-              whileTap: { scale: 0.98 }
-            }, sample.name);
-          })
+        h("label", { htmlFor: "samplePreset" }, "Example note"),
+        h("select", {
+          id: "samplePreset",
+          value: "",
+          onChange: function(event) {
+            const sample = props.samples[Number(event.target.value)];
+            if (sample) props.useSample(sample);
+          }
+        },
+          [h("option", { key: "empty", value: "" }, "Start from an example...")].concat(props.samples.map(function(sample, index) {
+            return h("option", { key: sample.name, value: String(index) }, sample.name);
+          }))
         ),
         h("div", { className: "toolbar-row" },
           h(motion.button, {
             className: "primary-action",
             type: "button",
-            onClick: props.runAgent,
+            onClick: props.submitDailyLog,
             disabled: running,
             whileHover: running ? {} : { y: -2 },
             whileTap: running ? {} : { scale: 0.98 }
-          }, running ? h(Activity, { size: 18 }) : h(Play, { size: 18 }), running ? "Running" : "Run agent")
+          }, running ? h(Activity, { size: 18 }) : h(Check, { size: 18 }), buttonLabel)
         ),
         props.error ? h("div", { className: "error-box" }, props.error) : null
       );
@@ -1344,9 +1331,9 @@ function html() {
     function SprinklerPanel(props) {
       const sprinkler = props.plan && props.plan.sprinkler_plan;
       const before = sprinkler && sprinkler.before ? sprinkler.before : { start_time: "6:30 AM", duration_minutes: 25, mode: "standard morning cycle" };
-      const after = sprinkler && sprinkler.after ? sprinkler.after : { start_time: "5:15 AM", duration_minutes: 42, mode: "agent-adjusted moisture recovery", status: "ready for approval" };
+      const after = sprinkler && sprinkler.after ? sprinkler.after : null;
       const zone = sprinkler && sprinkler.zone ? sprinkler.zone : "South road edge / lateral 2";
-      const decision = sprinkler && sprinkler.decision ? sprinkler.decision : "Ask the agent what to do. If history and the new log show water stress, its schedule change appears here for approval.";
+      const decision = sprinkler && sprinkler.decision ? sprinkler.decision : "Submit a daily log. If history and the new note show water stress, the proposed edit appears here for approval.";
 
       return h(motion.section, {
         className: "panel sprinkler-panel",
@@ -1383,15 +1370,18 @@ function html() {
           ),
           h("div", { className: "schedule-stack" },
             h(ScheduleCard, { label: "Before", data: before }),
-            h(ScheduleCard, { label: "After", data: after, after: true }),
-            h(motion.button, {
-              className: props.sprinklerApproved ? "secondary-action" : "primary-action secondary-action",
-              type: "button",
-              disabled: !sprinkler,
-              onClick: function() { props.setSprinklerApproved(!props.sprinklerApproved); },
-              whileHover: sprinkler ? { y: -2 } : {},
-              whileTap: sprinkler ? { scale: 0.98 } : {}
-            }, props.sprinklerApproved ? h(Check, { size: 17 }) : h(Droplets, { size: 17 }), props.sprinklerApproved ? "Sprinkler edit approved" : sprinkler ? "Approve sprinkler edit" : "Run agent for sprinkler edit")
+            after ? h(ScheduleCard, { label: "After", data: after, after: true }) : null,
+            sprinkler
+              ? props.sprinklerApproved
+                ? h("div", { className: "secondary-action" }, h(Check, { size: 17 }), "Sprinkler edit applied")
+                : h(motion.button, {
+                    className: "primary-action secondary-action",
+                    type: "button",
+                    onClick: function() { props.setSprinklerApproved(true); },
+                    whileHover: { y: -2 },
+                    whileTap: { scale: 0.98 }
+                  }, h(Droplets, { size: 17 }), "Apply sprinkler edit")
+              : h("div", { className: "empty" }, "No sprinkler edit queued yet.")
           )
         )
       );
@@ -1416,7 +1406,11 @@ function html() {
     }
 
     function PlanCards(props) {
-      const items = safeArray(props.recommendations).slice(0, 6);
+      const items = safeArray(props.recommendations).slice(0, 3);
+      const pendingItems = items.filter(function(rec) {
+        return rec.status !== "approved" && rec.status !== "dismissed";
+      });
+      const approvingAll = props.approvingId === "all";
       return h(motion.section, {
         className: "panel",
         initial: { opacity: 0, y: 18 },
@@ -1424,13 +1418,23 @@ function html() {
         transition: { delay: 0.2 }
       },
         h("div", { className: "panel-title" },
-          h("h2", null, h(ListChecks, { size: 18 }), "Crew approvals"),
-          h("span", { className: "state-chip" }, String(items.length) + " ready")
+          h("h2", null, h(ListChecks, { size: 18 }), "Suggested tasks"),
+          items.length
+            ? h(motion.button, {
+                className: "secondary-action",
+                type: "button",
+                onClick: function() { props.approveSuggestedTasks(items); },
+                disabled: approvingAll || !pendingItems.length,
+                whileHover: approvingAll || !pendingItems.length ? {} : { y: -2 },
+                whileTap: approvingAll || !pendingItems.length ? {} : { scale: 0.98 }
+              }, h(ClipboardCheck, { size: 16 }), approvingAll ? "Creating tasks" : pendingItems.length ? "Create suggested tasks" : "Tasks created")
+            : h("span", { className: "state-chip" }, "waiting")
         ),
         items.length ? h("div", { className: "plan-grid" },
           items.map(function(rec, index) {
             const id = compactId(rec._id);
             const reasons = safeArray(rec.reasoning_summary).slice(0, 3);
+            const isApproved = rec.status === "approved";
             return h(motion.article, {
               className: "plan-card",
               key: id || rec.title || String(index),
@@ -1442,25 +1446,17 @@ function html() {
             },
               h("div", { className: "plan-card-head" },
                 h("div", null, h("h3", null, rec.title || "Review field"), h("div", { className: "muted" }, rec.field_name || "Farm")),
-                h("span", { className: "priority-chip " + priorityClass(rec.priority) }, rec.priority || "medium")
+                h("span", { className: isApproved ? "state-chip" : "priority-chip " + priorityClass(rec.priority) }, isApproved ? "created" : rec.priority || "medium")
               ),
               h("p", null, rec.recommendation || "Review this recommendation before assigning the crew."),
               h("ul", { className: "reason-list" },
                 reasons.map(function(reason, reasonIndex) {
                   return h("li", { key: reason + String(reasonIndex) }, h(CheckCircle2, { size: 15 }), h("span", null, reason));
                 })
-              ),
-              h(motion.button, {
-                className: "secondary-action",
-                type: "button",
-                onClick: function() { props.approveRecommendation(rec); },
-                disabled: props.approvingId === id || rec.status === "approved",
-                whileHover: rec.status === "approved" ? {} : { y: -2 },
-                whileTap: rec.status === "approved" ? {} : { scale: 0.98 }
-              }, rec.status === "approved" ? h(Check, { size: 16 }) : h(ClipboardCheck, { size: 16 }), rec.status === "approved" ? "Approved" : props.approvingId === id ? "Approving" : "Approve job")
+              )
             );
           })
-        ) : h("div", { className: "empty" }, "Run the agent to fill this board with approval-ready work.")
+        ) : h("div", { className: "empty" }, "Submit a daily log to have Trellis suggest tasks.")
       );
     }
 
