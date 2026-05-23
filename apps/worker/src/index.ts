@@ -883,6 +883,249 @@ function html() {
 
   <main id="agentApp"></main>
 
+  <script>
+    window.renderFallbackApp = function(renderError) {
+      const root = document.getElementById("agentApp");
+      if (!root || root.dataset.fallbackRendered === "true" || root.children.length) return;
+      root.dataset.fallbackRendered = "true";
+
+      const sampleLogs = [
+        {
+          name: "South Field morning pass",
+          field: "South Field",
+          text: "South road edge has aphids under the newest leaves, some leaf curl, and dry wind burn along lateral 2. Sprinkler pressure looked low after 6:30 AM. Scout before spraying and add water before the crew arrives."
+        },
+        {
+          name: "North Field nutrient check",
+          field: "North Field",
+          text: "North Field looks uneven near the west gate. Yellowing on two rows, but soil is damp. Hold fertilizer until we compare against the last irrigation run and pull a quick tissue sample."
+        },
+        {
+          name: "West Field labor note",
+          field: "West Field",
+          text: "West Field weeding fell behind after the tractor repair. Crew can finish the center rows tomorrow if the sprayer is not blocking the lane. No pest pressure seen."
+        }
+      ];
+
+      const state = {
+        fieldName: "South Field",
+        date: todayIso(),
+        rawText: sampleLogs[0].text,
+        question: "What should I do tomorrow?",
+        health: null,
+        logs: [],
+        recommendations: [],
+        plan: null,
+        running: false,
+        approvingId: "",
+        sprinklerApproved: false,
+        error: renderError ? "Enhanced console did not load; using reliable demo mode." : ""
+      };
+
+      function todayIso() {
+        const date = new Date();
+        return date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0") + "-" + String(date.getDate()).padStart(2, "0");
+      }
+
+      function safeArray(value) {
+        return Array.isArray(value) ? value : [];
+      }
+
+      function compactId(value) {
+        if (!value) return "";
+        if (typeof value === "string") return value;
+        if (value.$oid) return value.$oid;
+        return String(value);
+      }
+
+      function escapeHtml(value) {
+        return String(value == null ? "" : value).replace(/[&<>"']/g, function(char) {
+          return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char];
+        });
+      }
+
+      async function api(path, options) {
+        const response = await fetch(path, options || {});
+        if (!response.ok) {
+          const text = await response.text();
+          throw new Error(text || response.statusText);
+        }
+        return response.json();
+      }
+
+      function updateStatus() {
+        const ready = Boolean(state.health && state.health.ok && state.health.mongo && state.health.mongo.ok);
+        const statusDot = document.getElementById("statusDot");
+        const statusText = document.getElementById("statusText");
+        if (statusDot) statusDot.classList.toggle("ready", ready);
+        if (statusText) statusText.textContent = ready ? "Trellis Sensor Array Online" : "Reliable demo mode";
+      }
+
+      async function refreshState() {
+        try {
+          const results = await Promise.all([
+            api("/api/health"),
+            api("/api/recommendations"),
+            api("/api/logs")
+          ]);
+          state.health = results[0];
+          state.recommendations = safeArray(results[1].recommendations);
+          state.logs = safeArray(results[2].logs);
+          state.error = "";
+        } catch (err) {
+          state.error = err.message || String(err);
+        }
+        updateStatus();
+        render();
+      }
+
+      async function runAgent() {
+        state.running = true;
+        state.plan = null;
+        state.sprinklerApproved = false;
+        state.error = "";
+        render();
+        try {
+          await api("/api/logs", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+              farm_id: "farm_demo",
+              field_name: state.fieldName,
+              raw_text: state.rawText,
+              date: state.date
+            })
+          });
+
+          state.plan = await api("/api/agent/ask", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+              farm_id: "farm_demo",
+              question: state.question
+            })
+          });
+          await refreshState();
+        } catch (err) {
+          state.error = err.message || String(err);
+        } finally {
+          state.running = false;
+          render();
+        }
+      }
+
+      async function approveRecommendation(rec) {
+        const id = compactId(rec && rec._id);
+        if (!id) return;
+        state.approvingId = id;
+        state.error = "";
+        render();
+        try {
+          await api("/api/recommendations/" + encodeURIComponent(id) + "/approve", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({})
+          });
+          await refreshState();
+        } catch (err) {
+          state.error = err.message || String(err);
+        } finally {
+          state.approvingId = "";
+          render();
+        }
+      }
+
+      function renderRecommendation(rec, index) {
+        const id = compactId(rec._id);
+        const approved = rec.status === "approved";
+        const reasons = safeArray(rec.reasoning_summary).slice(0, 2).map(function(reason) {
+          return "<li><span>" + escapeHtml(reason) + "</span></li>";
+        }).join("");
+        return "<div class=\\"approval-card\\" data-rec-index=\\"" + index + "\\">" +
+          "<div class=\\"card-top\\"><div class=\\"card-title\\"><h4>" + escapeHtml(rec.title || "Field Work Job") + "</h4><span>" + escapeHtml(rec.field_name || "Farm Area") + "</span></div>" +
+          "<span class=\\"badge " + (approved ? "badge-emerald" : "badge-amber") + "\\">" + escapeHtml(rec.priority || "Medium") + "</span></div>" +
+          "<div class=\\"card-body\\">" + escapeHtml(rec.recommendation || "Review this recommendation before assigning the crew.") + (reasons ? "<ul class=\\"bullets-list\\">" + reasons + "</ul>" : "") + "</div>" +
+          (approved ? "<div class=\\"approved-state-badge\\">Crew Task Deployed</div>" : "<button type=\\"button\\" class=\\"approve-btn\\" data-rec-id=\\"" + escapeHtml(id) + "\\">" + (state.approvingId === id ? "Assigning..." : "Approve & Deploy Task") + "</button>") +
+          "</div>";
+      }
+
+      function render() {
+        const sprinkler = state.plan && state.plan.sprinkler_plan;
+        const before = sprinkler && sprinkler.before ? sprinkler.before : {};
+        const after = sprinkler && sprinkler.after ? sprinkler.after : {};
+        const visibleRecommendations = state.recommendations.slice(0, 6);
+        const pendingCount = state.recommendations.filter(function(rec) {
+          return rec.status !== "approved" && rec.status !== "dismissed";
+        }).length + (sprinkler && !state.sprinklerApproved ? 1 : 0);
+        const logs = state.logs.slice(0, 10).map(function(log) {
+          const signals = safeArray(log.risk_signals).slice(0, 4).map(function(signal) {
+            return "<span class=\\"tag-chip\\">" + escapeHtml(String(signal).replace(/_/g, " ")) + "</span>";
+          }).join("");
+          return "<div class=\\"timeline-card\\"><div class=\\"timeline-meta\\"><strong>" + escapeHtml(log.field_name || "Field") + "</strong><span>" + escapeHtml(log.date || "") + "</span></div><p>" + escapeHtml(log.raw_text || log.embedding_text || "") + "</p><div class=\\"timeline-tags\\">" + signals + "</div></div>";
+        }).join("");
+
+        root.innerHTML =
+          "<div class=\\"agent-layout\\">" +
+            "<div style=\\"display:flex;flex-direction:column;gap:24px\\">" +
+              "<div class=\\"glass-panel\\"><div class=\\"panel-header\\"><h2>Agent Control Console</h2><span class=\\"badge badge-emerald\\">" + (state.running ? "Running..." : "Standby") + "</span></div>" +
+                (state.error ? "<div class=\\"error-card\\"><span>" + escapeHtml(state.error) + "</span></div>" : "") +
+                "<div class=\\"console-input-wrapper\\"><div class=\\"console-meta-row\\"><select id=\\"fallbackField\\" class=\\"console-field-select\\"><option>South Field</option><option>North Field</option><option>West Field</option></select><input id=\\"fallbackDate\\" type=\\"date\\" class=\\"console-date-input\\" value=\\"" + escapeHtml(state.date) + "\\" /></div><textarea id=\\"fallbackText\\" class=\\"console-textarea\\">" + escapeHtml(state.rawText) + "</textarea></div>" +
+                "<div><label style=\\"font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);display:block;margin-bottom:8px;font-weight:700\\">Preset Operations</label><div class=\\"presets-row\\">" + sampleLogs.map(function(sample, index) { return "<button type=\\"button\\" class=\\"preset-pill\\" data-sample=\\"" + index + "\\">" + escapeHtml(sample.name) + "</button>"; }).join("") + "</div></div>" +
+                "<div class=\\"console-input-wrapper\\" style=\\"padding:8px 12px\\"><input id=\\"fallbackQuestion\\" style=\\"background:transparent;border:none;width:100%;outline:none;font-size:14px\\" value=\\"" + escapeHtml(state.question) + "\\" /></div>" +
+                "<div class=\\"console-actions\\"><span style=\\"font-size:12px;color:var(--text-secondary)\\">Atlas persistent memory active</span><button id=\\"fallbackRun\\" type=\\"button\\" class=\\"primary-btn\\" " + (state.running ? "disabled" : "") + ">" + (state.running ? "Running Agent..." : "Run Operations Agent") + "</button></div>" +
+              "</div>" +
+              "<div class=\\"glass-panel timeline-container\\"><div class=\\"panel-header\\"><h2>Field memory log</h2><span class=\\"badge badge-emerald\\">" + state.logs.length + " saved</span></div><div class=\\"timeline-list\\">" + (logs || "<div class=\\"empty-state\\">No logged memories found yet.</div>") + "</div></div>" +
+            "</div>" +
+            "<div style=\\"display:flex;flex-direction:column;gap:24px\\">" +
+              "<div class=\\"glass-panel map-panel\\"><div class=\\"panel-header\\"><h2>Interactive telemetry map</h2></div><div class=\\"field-svg-container\\"><svg viewBox=\\"0 0 400 240\\" width=\\"100%\\" height=\\"240\\"><polygon class=\\"field-polygon warning\\" points=\\"40,40 180,30 160,110 50,120\\"></polygon><text x=\\"90\\" y=\\"80\\" fill=\\"#fff\\" font-size=\\"11px\\" font-weight=\\"700\\">North Field</text><polygon class=\\"field-polygon warning\\" points=\\"190,40 350,50 330,130 200,120\\"></polygon><text x=\\"240\\" y=\\"85\\" fill=\\"#fff\\" font-size=\\"11px\\" font-weight=\\"700\\">South Field</text><polygon class=\\"field-polygon warning\\" points=\\"80,140 310,140 280,210 100,210\\"></polygon><text x=\\"170\\" y=\\"180\\" fill=\\"#fff\\" font-size=\\"11px\\" font-weight=\\"700\\">West Field</text></svg></div></div>" +
+              "<div class=\\"glass-panel\\"><div class=\\"panel-header\\"><h2>Grower Approvals Queue</h2><span class=\\"badge badge-amber\\">" + pendingCount + " Pending</span></div><div class=\\"approvals-deck\\">" +
+                (sprinkler ? "<div class=\\"approval-card\\"><div class=\\"card-top\\"><div class=\\"card-title\\"><h4>Smart Sprinkler Schedule Change</h4><span>" + escapeHtml(sprinkler.zone || state.fieldName) + "</span></div><span class=\\"badge " + (state.sprinklerApproved ? "badge-emerald" : "badge-amber") + "\\">" + (state.sprinklerApproved ? "approved" : "ready") + "</span></div><div class=\\"card-body\\">" + escapeHtml(sprinkler.decision || "The agent optimized tomorrow's water cycle.") + "<div class=\\"comparison-grid\\" style=\\"margin-top:12px\\"><div class=\\"compare-side\\"><strong>Before</strong><p>" + escapeHtml(before.start_time || "6:30 AM") + "</p><small>" + escapeHtml(before.duration_minutes || 25) + " minutes</small></div><div class=\\"compare-side after-side\\"><strong>After</strong><p>" + escapeHtml(after.start_time || "5:15 AM") + "</p><small>" + escapeHtml(after.duration_minutes || 42) + " minutes</small></div></div></div>" + (state.sprinklerApproved ? "<div class=\\"approved-state-badge\\">Sprinkler adjustment deployed</div>" : "<button id=\\"fallbackSprinkler\\" type=\\"button\\" class=\\"approve-btn\\">Deploy Irrigation Schedule</button>") + "</div>" : "") +
+                (visibleRecommendations.length ? visibleRecommendations.map(renderRecommendation).join("") : "<div class=\\"empty-state\\">Run the agent to fill this queue with approval-ready work.</div>") +
+              "</div></div>" +
+            "</div>" +
+          "</div>";
+
+        const field = document.getElementById("fallbackField");
+        if (field) field.value = state.fieldName;
+        const date = document.getElementById("fallbackDate");
+        if (date) date.onchange = function(event) { state.date = event.target.value; };
+        const text = document.getElementById("fallbackText");
+        if (text) text.oninput = function(event) { state.rawText = event.target.value; };
+        const question = document.getElementById("fallbackQuestion");
+        if (question) question.oninput = function(event) { state.question = event.target.value; };
+        if (field) field.onchange = function(event) { state.fieldName = event.target.value; };
+        const run = document.getElementById("fallbackRun");
+        if (run) run.onclick = runAgent;
+        const sprinklerButton = document.getElementById("fallbackSprinkler");
+        if (sprinklerButton) sprinklerButton.onclick = function() { state.sprinklerApproved = true; render(); };
+        Array.from(root.querySelectorAll("[data-sample]")).forEach(function(button) {
+          button.onclick = function() {
+            const sample = sampleLogs[Number(button.dataset.sample)];
+            state.fieldName = sample.field;
+            state.rawText = sample.text;
+            render();
+          };
+        });
+        Array.from(root.querySelectorAll("[data-rec-id]")).forEach(function(button) {
+          button.onclick = function() {
+            const rec = visibleRecommendations.find(function(item) { return compactId(item._id) === button.dataset.recId; });
+            approveRecommendation(rec);
+          };
+        });
+      }
+
+      render();
+      refreshState();
+    };
+
+    window.setTimeout(function() {
+      const root = document.getElementById("agentApp");
+      if (root && !root.children.length && window.renderFallbackApp) {
+        window.renderFallbackApp(new Error("Enhanced console timed out"));
+      }
+    }, 3500);
+  </script>
+
   <script type="module">
     import React, { useEffect, useMemo, useState } from "https://esm.sh/react@18.3.1";
     import { createRoot } from "https://esm.sh/react-dom@18.3.1/client";
