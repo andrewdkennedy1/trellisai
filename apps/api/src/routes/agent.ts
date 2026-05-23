@@ -48,13 +48,13 @@ agentRouter.post("/ask", asyncHandler(async (req, res) => {
 
   if (/risk|risks|priority/i.test(input.question)) {
     return res.json({
-      answer: "Here are the current field risk signals from MongoDB farm memory.",
+      answer: "Here are the current field risk signals from farm memory.",
       risks: await aggregateFarmRisks(db, input.farm_id)
     });
   }
 
   return res.json({
-    answer: "I can generate daily action plans, summarize field history, and rank farm risks from MongoDB farm memory.",
+    answer: "I can generate daily action plans, summarize field history, and rank farm risks from farm memory.",
     examples: [
       "What should I do tomorrow?",
       "Show history for North Field",

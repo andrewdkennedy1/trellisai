@@ -15,14 +15,18 @@ function html() {
     :root {
       color-scheme: light;
       --ink: #17211a;
-      --muted: #5a665c;
-      --line: #d9dfd4;
-      --panel: #ffffff;
-      --field: #eff5ec;
-      --accent: #276749;
-      --accent-strong: #1f5139;
-      --alert: #b45309;
-      --sky: #dfeef0;
+      --muted: #657064;
+      --panel: #fffdf7;
+      --panel-strong: #f7f2e7;
+      --field: #eef6ec;
+      --line: #d8decf;
+      --green: #276749;
+      --green-strong: #1d4d36;
+      --teal: #1f6f78;
+      --amber: #bd6b14;
+      --red: #a5402d;
+      --blue: #315f9d;
+      --shadow: 0 22px 80px rgba(35, 50, 35, 0.13);
     }
 
     * {
@@ -31,20 +35,33 @@ function html() {
 
     body {
       margin: 0;
+      min-width: 320px;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f6f7f1;
+      background: #f4f3ec;
       color: var(--ink);
     }
 
-    header {
-      border-bottom: 1px solid var(--line);
-      background: #fbfcf7;
+    button, input, textarea, select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
     }
 
     .topbar {
-      max-width: 1180px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid rgba(101, 112, 100, 0.22);
+      background: rgba(255, 253, 247, 0.92);
+      backdrop-filter: blur(18px);
+    }
+
+    .topbar-inner {
+      max-width: 1380px;
       margin: 0 auto;
-      padding: 16px 20px;
+      padding: 14px 22px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -55,943 +72,1478 @@ function html() {
       display: flex;
       align-items: center;
       gap: 10px;
-      font-weight: 800;
+      min-width: 0;
+      font-size: 21px;
+      font-weight: 850;
       letter-spacing: 0;
-      font-size: 20px;
     }
 
-    .mark {
-      width: 36px;
-      height: 36px;
+    .brand img {
+      width: 38px;
+      height: 38px;
       border-radius: 8px;
       object-fit: cover;
-      flex: 0 0 auto;
+      box-shadow: 0 8px 20px rgba(39, 103, 73, 0.18);
     }
 
-    .status {
-      display: flex;
-      gap: 8px;
+    .status-pill {
+      display: inline-flex;
       align-items: center;
+      gap: 8px;
+      min-height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 7px 10px;
+      background: #fff;
       color: var(--muted);
-      font-size: 14px;
+      font-size: 13px;
+      font-weight: 760;
+      white-space: nowrap;
     }
 
-    .dot {
+    .status-dot {
       width: 9px;
       height: 9px;
       border-radius: 99px;
       background: #9ca3af;
     }
 
-    .dot.ready {
-      background: #16a34a;
+    .status-dot.ready {
+      background: #18a558;
+      box-shadow: 0 0 0 4px rgba(24, 165, 88, 0.14);
     }
 
     main {
-      max-width: 1180px;
+      max-width: 1380px;
       margin: 0 auto;
-      padding: 24px 20px 40px;
-      display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(340px, .9fr);
-      gap: 20px;
+      padding: 22px 22px 46px;
     }
 
-    .visual {
-      min-height: 220px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
+    .agent-shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(340px, 0.65fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .agent-stage {
+      position: relative;
+      min-height: 548px;
       overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 8px;
       background:
-        linear-gradient(180deg, rgba(0, 0, 0, .08), rgba(0, 0, 0, .05)),
-        url("https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1400&q=80");
+        linear-gradient(105deg, rgba(15, 27, 20, 0.86), rgba(25, 53, 39, 0.68) 48%, rgba(93, 72, 35, 0.44)),
+        url("https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1800&q=82");
       background-size: cover;
       background-position: center;
-      display: flex;
-      align-items: flex-end;
-      padding: 18px;
-      color: white;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, .35);
+      color: #fff;
+      box-shadow: var(--shadow);
     }
 
-    .visual h1 {
-      margin: 0;
-      font-size: 32px;
-      line-height: 1.05;
+    .stage-grid {
+      position: relative;
+      z-index: 1;
+      min-height: inherit;
+      display: grid;
+      grid-template-columns: minmax(0, 0.92fr) minmax(260px, 0.58fr);
+      gap: 22px;
+      padding: 28px;
+    }
+
+    .stage-copy {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-width: 0;
+      gap: 28px;
+    }
+
+    .agent-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 13px;
+      font-weight: 780;
+    }
+
+    .agent-stage h1 {
+      max-width: 780px;
+      margin: 20px 0 12px;
+      font-size: clamp(40px, 5.5vw, 80px);
+      line-height: 0.95;
       letter-spacing: 0;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-top: 12px;
+    .agent-answer {
+      max-width: 720px;
+      color: rgba(255, 255, 255, 0.88);
+      font-size: clamp(17px, 1.6vw, 21px);
+      line-height: 1.5;
     }
 
-    section, aside {
+    .run-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .primary-action, .secondary-action, .icon-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 8px;
+      min-height: 42px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 820;
+      letter-spacing: 0;
+      transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+
+    .primary-action {
+      background: #ffffff;
+      color: #123323;
+      box-shadow: 0 16px 42px rgba(0, 0, 0, 0.24);
+    }
+
+    .primary-action:disabled {
+      cursor: wait;
+      opacity: 0.78;
+    }
+
+    .secondary-action {
+      border: 1px solid var(--line);
+      background: #edf3e9;
+      color: #183322;
+    }
+
+    .ghost-action {
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    .icon-action {
+      width: 42px;
+      padding: 0;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--green);
+    }
+
+    .stage-board {
+      display: grid;
+      gap: 12px;
+      align-content: end;
+    }
+
+    .thought-card, .receipt-card, .panel, .mini-card, .log-card, .plan-card, .turn-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
       background: var(--panel);
+    }
+
+    .thought-card {
+      display: grid;
+      gap: 8px;
+      padding: 14px;
+      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      backdrop-filter: blur(14px);
+    }
+
+    .thought-card span {
+      color: rgba(255, 255, 255, 0.66);
+      font-size: 12px;
+      font-weight: 820;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .thought-card p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.92);
+      line-height: 1.45;
+      font-size: 15px;
+    }
+
+    .receipt-rail {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 14px;
+      min-height: 548px;
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 18px;
+      background: #fffdf7;
+      box-shadow: 0 18px 50px rgba(42, 53, 37, 0.08);
     }
 
-    h2 {
-      margin: 0 0 14px;
-      font-size: 18px;
+    .panel-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 0 0 12px;
+    }
+
+    .panel-title h2, .panel-title h3 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.2;
       letter-spacing: 0;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .receipt-list {
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+
+    .receipt-card {
+      position: relative;
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr);
+      gap: 10px;
+      padding: 12px;
+      overflow: hidden;
+    }
+
+    .receipt-card.active {
+      border-color: rgba(39, 103, 73, 0.48);
+      box-shadow: 0 10px 24px rgba(39, 103, 73, 0.12);
+    }
+
+    .receipt-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: #edf5e9;
+      color: var(--green);
+    }
+
+    .receipt-card.approval .receipt-icon {
+      background: #fff1dc;
+      color: var(--amber);
+    }
+
+    .receipt-card.watch .receipt-icon {
+      background: #e9f3f5;
+      color: var(--teal);
+    }
+
+    .receipt-card strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
+    .receipt-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.42;
+    }
+
+    .receipt-progress {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 8px;
+      background: #e8e2d5;
+    }
+
+    .receipt-progress span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--green), var(--teal), var(--amber));
+    }
+
+    .workbench {
+      display: grid;
+      grid-template-columns: minmax(320px, 0.82fr) minmax(0, 1.18fr);
+      gap: 18px;
+      margin-top: 18px;
+      align-items: start;
+    }
+
+    .stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .panel {
+      padding: 18px;
+      background: #fffdf7;
+      box-shadow: 0 12px 36px rgba(42, 53, 37, 0.07);
     }
 
     label {
       display: block;
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 700;
-      margin: 12px 0 6px;
+      margin: 13px 0 6px;
+      color: #445243;
+      font-size: 12px;
+      font-weight: 820;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
     }
 
-    input, textarea, select {
+    select, textarea, input {
       width: 100%;
       border: 1px solid #cbd5c4;
       border-radius: 8px;
-      background: #fbfdf8;
+      background: #fffefa;
       color: var(--ink);
-      font: inherit;
-      padding: 10px 11px;
+      padding: 11px 12px;
+      outline: none;
     }
 
     textarea {
+      min-height: 170px;
       resize: vertical;
-      min-height: 116px;
+      line-height: 1.48;
     }
 
-    button {
-      border: 0;
-      border-radius: 8px;
-      background: var(--accent);
-      color: white;
-      font: inherit;
-      font-weight: 800;
-      padding: 10px 12px;
-      cursor: pointer;
+    select:focus, textarea:focus, input:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 4px rgba(39, 103, 73, 0.12);
     }
 
-    button.secondary {
-      background: #e7eee2;
-      color: #183322;
-      border: 1px solid #cbd8c5;
-    }
-
-    .actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    .actions button {
-      flex: 1;
-    }
-
-    .field-tile {
-      background: var(--field);
-      border: 1px solid #d4decf;
-      border-radius: 8px;
-      min-height: 92px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .field-tile strong {
-      display: block;
-      font-size: 15px;
-    }
-
-    .field-tile span {
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .right-column {
-      display: grid;
-      gap: 20px;
-      align-content: start;
-    }
-
-    .metric-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-
-    .metric {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 10px;
-      background: #fafbf5;
-    }
-
-    .metric strong {
-      display: block;
-      font-size: 20px;
-      line-height: 1;
-    }
-
-    .metric span {
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .feed {
-      min-height: 360px;
-      display: grid;
-      gap: 12px;
-      align-content: start;
-    }
-
-    .empty-state,
-    .working-state,
-    .error-state {
-      border: 1px dashed #cbd8c5;
-      border-radius: 8px;
-      padding: 18px;
-      background: #fafbf5;
-      display: grid;
-      gap: 6px;
-    }
-
-    .empty-state strong,
-    .working-state strong,
-    .error-state strong {
-      font-size: 16px;
-    }
-
-    .empty-state span,
-    .working-state span,
-    .error-state span,
-    .muted-text {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.45;
-    }
-
-    .error-state {
-      border-color: #f2c4ae;
-      background: #fff7ed;
-      color: #9a3412;
-    }
-
-    .summary-card,
-    .plan-card,
-    .task-card {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fbfdf8;
-      padding: 14px;
-      display: grid;
-      gap: 10px;
-    }
-
-    .card-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: flex-start;
-    }
-
-    .card-top h3 {
-      margin: 0;
-      font-size: 16px;
-      line-height: 1.25;
-    }
-
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-    }
-
-    .summary-item {
-      border: 1px solid #dce5d7;
-      border-radius: 8px;
-      padding: 10px;
-      background: #ffffff;
-    }
-
-    .summary-item span {
-      display: block;
-      color: var(--muted);
-      font-size: 12px;
-      margin-bottom: 3px;
-    }
-
-    .chips {
+    .sample-row, .toolbar-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
+      gap: 8px;
+      margin-top: 10px;
     }
 
-    .chip,
-    .priority {
-      display: inline-flex;
-      align-items: center;
-      min-height: 24px;
-      border-radius: 999px;
-      padding: 4px 9px;
+    .sample-row button {
+      border: 1px solid #d8decf;
+      border-radius: 8px;
+      background: #f3f7ef;
+      color: #253a2b;
+      padding: 8px 10px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 760;
+    }
+
+    .control-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .mini-card {
+      padding: 12px;
+      min-height: 86px;
+      background: #fbfaf4;
+    }
+
+    .mini-card span {
+      display: block;
+      color: var(--muted);
       font-size: 12px;
-      font-weight: 800;
-      background: #e7eee2;
-      color: #244a33;
+      font-weight: 780;
+      margin-bottom: 7px;
     }
 
-    .priority.high {
-      background: #fee2e2;
-      color: #991b1b;
+    .mini-card strong {
+      font-size: 21px;
+      letter-spacing: 0;
     }
 
-    .priority.medium {
-      background: #fef3c7;
-      color: #92400e;
+    .sprinkler-panel {
+      position: relative;
+      overflow: hidden;
     }
 
-    .priority.low {
-      background: #dbeafe;
-      color: #1e40af;
+    .sprinkler-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 0.86fr) minmax(220px, 0.74fr);
+      gap: 14px;
+      align-items: stretch;
     }
 
-    .reason-list {
-      margin: 0;
-      padding-left: 18px;
+    .field-map {
+      position: relative;
+      min-height: 254px;
+      border: 1px solid #d3dbc9;
+      border-radius: 8px;
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, rgba(39, 103, 73, 0.18) 1px, transparent 1px),
+        linear-gradient(rgba(39, 103, 73, 0.12) 1px, transparent 1px),
+        #eaf3e3;
+      background-size: 34px 34px;
+    }
+
+    .field-map::before {
+      content: "";
+      position: absolute;
+      inset: 18px;
+      border: 1px solid rgba(39, 103, 73, 0.24);
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.46), rgba(255,255,255,0.06));
+    }
+
+    .spray-line {
+      position: absolute;
+      left: 12%;
+      right: 12%;
+      height: 10px;
+      border-radius: 8px;
+      background: rgba(31, 111, 120, 0.88);
+      box-shadow: 0 0 0 8px rgba(31, 111, 120, 0.11);
+    }
+
+    .spray-line.one {
+      top: 35%;
+    }
+
+    .spray-line.two {
+      top: 58%;
+      background: rgba(189, 107, 20, 0.88);
+      box-shadow: 0 0 0 8px rgba(189, 107, 20, 0.12);
+    }
+
+    .sprinkler-badge {
+      position: absolute;
+      left: 18px;
+      bottom: 18px;
+      right: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-radius: 8px;
+      padding: 12px;
+      background: rgba(255, 253, 247, 0.92);
+      color: var(--ink);
+      box-shadow: 0 12px 30px rgba(42, 53, 37, 0.12);
+    }
+
+    .schedule-stack {
+      display: grid;
+      gap: 10px;
+    }
+
+    .schedule-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fbfaf4;
+    }
+
+    .schedule-card.after {
+      border-color: rgba(39, 103, 73, 0.42);
+      background: #f0f7ec;
+    }
+
+    .schedule-card small {
+      display: block;
+      color: var(--muted);
+      font-weight: 820;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+
+    .schedule-time {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: baseline;
+      font-weight: 860;
+      font-size: 24px;
+    }
+
+    .schedule-time span {
       color: var(--muted);
       font-size: 13px;
-      line-height: 1.45;
+      font-weight: 760;
     }
 
-    .small-button {
-      width: auto;
-      min-width: 116px;
-      padding: 8px 10px;
-      font-size: 13px;
-    }
-
-    .task-card {
-      grid-template-columns: 1fr auto;
+    .approval-chip, .priority-chip, .state-chip {
+      display: inline-flex;
       align-items: center;
-      background: #eef7f0;
+      gap: 6px;
+      border-radius: 8px;
+      min-height: 28px;
+      padding: 5px 8px;
+      font-size: 12px;
+      font-weight: 820;
+      white-space: nowrap;
     }
 
-    .task-card strong {
-      display: block;
+    .approval-chip {
+      background: #fff0d8;
+      color: #85440a;
+    }
+
+    .state-chip {
+      background: #edf5e9;
+      color: var(--green-strong);
+    }
+
+    .priority-chip.high {
+      background: #ffe7e0;
+      color: var(--red);
+    }
+
+    .priority-chip.medium {
+      background: #fff1dc;
+      color: #8a4b0c;
+    }
+
+    .priority-chip.low {
+      background: #e7f0fb;
+      color: var(--blue);
+    }
+
+    .plan-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .plan-card {
+      display: grid;
+      gap: 10px;
+      min-height: 210px;
+      padding: 14px;
+      background: #fffefa;
+    }
+
+    .plan-card-head {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .plan-card h3 {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    .plan-card p {
+      margin: 0;
+      color: #485346;
+      line-height: 1.45;
       font-size: 14px;
     }
 
-    .trace {
+    .reason-list {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 8px;
+      gap: 7px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
     }
 
-    .trace-step {
-      border: 1px solid #dce5d7;
-      border-radius: 8px;
-      background: #ffffff;
-      padding: 10px;
+    .reason-list li {
       display: grid;
-      gap: 4px;
-    }
-
-    .trace-step strong {
+      grid-template-columns: 18px minmax(0, 1fr);
+      gap: 7px;
+      color: var(--muted);
       font-size: 13px;
+      line-height: 1.35;
     }
 
-    .memory-card {
-      border-left: 3px solid var(--accent);
-    }
-
-    .memory-row {
-      border: 1px solid #dce5d7;
-      border-radius: 8px;
-      background: #ffffff;
-      padding: 10px;
-      display: grid;
-      gap: 8px;
-    }
-
-    .score {
-      color: var(--accent-strong);
-      font-size: 12px;
-      font-weight: 800;
-    }
-
-    .thread,
-    .history-list {
+    .log-history {
       display: grid;
       gap: 10px;
-      max-height: 300px;
+      max-height: 492px;
       overflow: auto;
-      padding-right: 2px;
+      padding-right: 4px;
     }
 
-    .message {
-      border-radius: 8px;
-      padding: 10px;
-      display: grid;
-      gap: 6px;
-      border: 1px solid var(--line);
-      background: #ffffff;
+    .log-card {
+      padding: 12px;
+      background: #fffefa;
     }
 
-    .message.user {
-      background: #eef7f0;
+    .log-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 7px;
     }
 
-    .message.agent {
-      background: #f8fafc;
+    .log-card strong {
+      font-size: 14px;
     }
 
-    .message strong,
-    .history-item strong {
+    .log-card p {
+      margin: 0;
+      color: var(--muted);
       font-size: 13px;
+      line-height: 1.4;
     }
 
-    .tool-strip {
+    .tag-row {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
+      margin-top: 9px;
     }
 
-    .tool-call {
-      border: 1px solid #cbd8c5;
-      background: #ffffff;
-      color: #244a33;
+    .tag {
       border-radius: 8px;
-      padding: 6px 8px;
+      background: #edf3e9;
+      color: #38513e;
+      padding: 4px 7px;
       font-size: 12px;
-      font-weight: 800;
+      font-weight: 750;
     }
 
-    .history-item {
+    .turn-tape {
+      display: grid;
+      gap: 10px;
+    }
+
+    .turn-card {
+      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr);
+      gap: 10px;
+      padding: 12px;
+      background: #fffefa;
+    }
+
+    .turn-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: #eaf3e3;
+      color: var(--green);
+    }
+
+    .turn-card p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .video-frame {
+      aspect-ratio: 16 / 9;
+      width: 100%;
+      overflow: hidden;
       border: 1px solid var(--line);
       border-radius: 8px;
-      padding: 10px;
-      background: #fbfdf8;
-      display: grid;
-      gap: 6px;
+      background: #151915;
     }
 
-    @media (max-width: 860px) {
+    .video-frame iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .empty {
+      border: 1px dashed #c9d1c0;
+      border-radius: 8px;
+      padding: 18px;
+      color: var(--muted);
+      background: #fbfaf4;
+      line-height: 1.45;
+    }
+
+    .error-box {
+      margin-top: 12px;
+      border: 1px solid #f0b3a6;
+      border-radius: 8px;
+      padding: 11px;
+      background: #fff0ec;
+      color: #842c1d;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 1100px) {
+      .agent-shell, .workbench, .stage-grid, .sprinkler-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .agent-stage, .receipt-rail {
+        min-height: auto;
+      }
+
+      .stage-board {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 760px) {
+      .topbar-inner {
+        padding: 12px 14px;
+      }
+
+      .status-pill {
+        max-width: 46vw;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
       main {
+        padding: 14px 14px 34px;
+      }
+
+      .stage-grid {
+        padding: 20px;
+      }
+
+      .agent-stage h1 {
+        font-size: 42px;
+      }
+
+      .stage-board, .plan-grid, .control-grid {
         grid-template-columns: 1fr;
       }
 
-      .grid, .metric-row, .trace {
-        grid-template-columns: 1fr;
+      .panel {
+        padding: 15px;
       }
 
-      .visual h1 {
-        font-size: 26px;
+      .run-row .primary-action, .run-row .secondary-action {
+        width: 100%;
       }
     }
   </style>
 </head>
 <body>
-  <header>
-    <div class="topbar">
-      <div class="brand"><img class="mark" src="/trellisai-logo.png" alt="" /><span>TrellisAI</span></div>
-      <div class="status"><span id="statusDot" class="dot"></span><span id="statusText">Checking farm memory</span></div>
-    </div>
-  </header>
-
-  <main>
-    <div>
-      <div class="visual">
-        <h1>Farm memory to field action</h1>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <img src="/trellisai-logo.png" alt="TrellisAI logo" />
+        <span>TrellisAI</span>
       </div>
-
-      <div class="grid" aria-label="Demo fields">
-        <div class="field-tile"><strong>North Field</strong><span>Corn, nitrogen and irrigation watch</span></div>
-        <div class="field-tile"><strong>South Field</strong><span>Soybeans, aphid pressure</span></div>
-        <div class="field-tile"><strong>West Field</strong><span>Lettuce, harvest timing</span></div>
+      <div class="status-pill">
+        <span id="statusDot" class="status-dot"></span>
+        <span id="statusText">Checking farm memory</span>
       </div>
-
-      <section style="margin-top: 20px;">
-        <h2>Daily Log</h2>
-        <label for="field">Field</label>
-        <select id="field">
-          <option>North Field</option>
-          <option>South Field</option>
-          <option>West Field</option>
-        </select>
-
-        <label for="log">Log note</label>
-        <textarea id="log">North Field corn has yellowing near the east edge. Irrigated 45 minutes yesterday.</textarea>
-
-        <div class="actions">
-          <button type="button" onclick="createLog()">Save log</button>
-          <button type="button" class="secondary" onclick="askAgent()">Generate plan</button>
-        </div>
-      </section>
     </div>
+  </div>
+  <main id="agentApp"></main>
 
-    <div class="right-column">
-      <aside>
-        <h2>Farm State</h2>
-        <div class="metric-row">
-          <div class="metric"><strong id="fieldCount">3</strong><span>fields</span></div>
-          <div class="metric"><strong id="logCount">0</strong><span>logs</span></div>
-          <div class="metric"><strong id="taskCount">0</strong><span>open tasks</span></div>
-          <div class="metric"><strong id="recCount">0</strong><span>recommendations</span></div>
-        </div>
-        <label for="question">Agent request</label>
-        <textarea id="question" rows="3">What should I do tomorrow?</textarea>
-        <div class="actions">
-          <button type="button" onclick="askAgent()">Ask</button>
-          <button type="button" class="secondary" onclick="loadState(true)">Refresh</button>
-        </div>
-      </aside>
+  <script type="module">
+    import React, { useEffect, useMemo, useState } from "https://esm.sh/react@18.3.1";
+    import { createRoot } from "https://esm.sh/react-dom@18.3.1/client";
+    import { AnimatePresence, LayoutGroup, motion } from "https://esm.sh/framer-motion@11.18.2?deps=react@18.3.1";
+    import { Activity, Check, CheckCircle2, ClipboardCheck, Droplets, History, ListChecks, Play, Radio, Send, Sparkles, Sprout, Youtube } from "https://esm.sh/lucide-react@0.468.0?deps=react@18.3.1";
 
-      <aside>
-        <h2>Agent Thread</h2>
-        <div id="thread" class="thread">
-          <div class="message agent">
-            <strong>Turn 0 - TrellisAI</strong>
-            <span class="muted-text">Ready to read field notes, remember similar past issues, check unfinished work, and draft tomorrow's plan.</span>
-          </div>
-        </div>
-      </aside>
-
-      <aside>
-        <h2>What Trellis Checked</h2>
-        <div id="output" class="feed">
-          <div class="empty-state">
-            <strong>Ready for the farm log.</strong>
-            <span>Save a note or ask TrellisAI for tomorrow's plan.</span>
-          </div>
-        </div>
-      </aside>
-
-      <aside>
-        <h2>Log History</h2>
-        <div id="logHistory" class="history-list"></div>
-      </aside>
-    </div>
-  </main>
-
-  <script>
-    const output = document.getElementById("output");
-    const thread = document.getElementById("thread");
-    const logHistory = document.getElementById("logHistory");
-    const statusDot = document.getElementById("statusDot");
-    const statusText = document.getElementById("statusText");
-    let latestRecommendations = [];
-    const conversation = [];
-
-    async function api(path, options) {
-      const response = await fetch(path, options);
-      const body = await response.json();
-      if (!response.ok) throw new Error(body.error || "Request failed");
-      return body;
-    }
-
-    function escapeHtml(value) {
-      return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-    function setWorking(title, detail) {
-      output.innerHTML =
-        '<div class="working-state">' +
-          '<strong>' + escapeHtml(title) + '</strong>' +
-          '<span>' + escapeHtml(detail || "TrellisAI is reading farm memory and updating the dashboard.") + '</span>' +
-        '</div>';
-    }
-
-    function setError(error) {
-      output.innerHTML =
-        '<div class="error-state">' +
-          '<strong>Something needs attention</strong>' +
-          '<span>' + escapeHtml(error.message || error) + '</span>' +
-        '</div>';
-    }
-
-    function priorityBadge(priority) {
-      const normalized = String(priority || "medium").toLowerCase();
-      return '<span class="priority ' + escapeHtml(normalized) + '">' + escapeHtml(normalized.toUpperCase()) + '</span>';
-    }
-
-    function plainToolName(name) {
-      const value = String(name || "");
-      if (value === "aggregateFarmRisks") return "Checked field risks";
-      if (value === "retrieveFarmMemory") return "Found similar past notes";
-      if (value === "findOpenTasks") return "Checked unfinished jobs";
-      if (value === "saveRecommendations") return "Drafted tomorrow's plan";
-      if (value.includes("extraction")) return "Understood the note";
-      if (value.includes("insertOne")) return "Saved to field memory";
-      if (value.includes("embedding")) return "Prepared future recall";
-      if (value.includes("updateOne")) return "Marked plan approved";
-      return value.replaceAll("_", " ");
-    }
-
-    function plainToolResult(tool) {
-      const name = String(tool.name || "");
-      const result = String(tool.result || "");
-      if (name === "aggregateFarmRisks") return result.replace("field risk group(s) ranked", "fields reviewed");
-      if (name === "retrieveFarmMemory") return result.replace("memory match(es) returned", "similar notes found");
-      if (name === "findOpenTasks") return result.replace("open task(s) found", "unfinished jobs found");
-      if (name === "saveRecommendations") return result.replace("recommendation(s) saved", "plan items drafted");
-      return result;
-    }
-
-    function plainSentence(value) {
-      return String(value || "")
-        .replaceAll("MongoDB", "farm memory")
-        .replaceAll("Gemini", "Trellis")
-        .replaceAll("Cloud Run", "field service")
-        .replaceAll("Agent Platform", "Trellis")
-        .replaceAll("Vector Search", "similar-note search")
-        .replaceAll("vector", "similar-note")
-        .replaceAll("embedding", "memory")
-        .replaceAll("MCP", "tool")
-        .replaceAll("open task(s) are already in farm memory", "unfinished jobs are already on the farm");
-    }
-
-    function chips(items) {
-      const list = Array.isArray(items) ? items.filter(Boolean) : [];
-      if (!list.length) return '<span class="muted-text">No signals found.</span>';
-      return '<div class="chips">' + list.map((item) => '<span class="chip">' + escapeHtml(item.signal || item.type || item) + '</span>').join("") + '</div>';
-    }
-
-    function pushTurn(role, title, detail, toolCalls) {
-      conversation.push({ role, title, detail, toolCalls: Array.isArray(toolCalls) ? toolCalls : [] });
-      renderThread();
-    }
-
-    function renderThread() {
-      const visible = conversation.slice(-6);
-      if (!visible.length) return;
-      thread.innerHTML = visible.map((item, index) => {
-        const tools = item.toolCalls.length
-          ? '<div class="tool-strip">' + item.toolCalls.map((tool) => '<span class="tool-call">' + escapeHtml(plainToolName(tool.name || tool)) + '</span>').join("") + '</div>'
-          : "";
-        return '<div class="message ' + escapeHtml(item.role) + '">' +
-          '<strong>Turn ' + escapeHtml(index + Math.max(1, conversation.length - visible.length + 1)) + ' - ' + escapeHtml(item.title) + '</strong>' +
-          '<span class="muted-text">' + escapeHtml(item.detail) + '</span>' +
-          tools +
-        '</div>';
-      }).join("");
-      thread.scrollTop = thread.scrollHeight;
-    }
-
-    function renderLogHistory(logs) {
-      const recent = Array.isArray(logs) ? logs.slice(0, 12) : [];
-      if (!recent.length) {
-        logHistory.innerHTML = '<div class="empty-state"><strong>No logs yet.</strong><span>Add a farm note to start building memory.</span></div>';
-        return;
+    const h = React.createElement;
+    const demoVideoUrl = "https://www.youtube.com/embed/EE6EDAMAjEI";
+    const sampleLogs = [
+      {
+        name: "South Field morning pass",
+        field: "South Field",
+        text: "South road edge has aphids under the newest leaves, some leaf curl, and dry wind burn along lateral 2. Sprinkler pressure looked low after 6:30 AM. Scout before spraying and add water before the crew arrives."
+      },
+      {
+        name: "North Field nutrient check",
+        field: "North Field",
+        text: "North Field looks uneven near the west gate. Yellowing on two rows, but soil is damp. Hold fertilizer until we compare against the last irrigation run and pull a quick tissue sample."
+      },
+      {
+        name: "West Field labor note",
+        field: "West Field",
+        text: "West Field weeding fell behind after the tractor repair. Crew can finish the center rows tomorrow if the sprayer is not blocking the lane. No pest pressure seen."
       }
-      logHistory.innerHTML = recent.map((log) =>
-        '<div class="history-item">' +
-          '<div class="card-top">' +
-            '<div><strong>' + escapeHtml(log.field_name || "Field") + '</strong><div class="muted-text">' + escapeHtml(log.date || "") + '</div></div>' +
-            '<span class="chip">READ</span>' +
-          '</div>' +
-          '<div>' + escapeHtml(log.raw_text || "") + '</div>' +
-          chips(log.risk_signals) +
-        '</div>'
-      ).join("");
+    ];
+
+    function api(path, options) {
+      return fetch(path, options || {}).then(async function(response) {
+        if (!response.ok) {
+          const text = await response.text();
+          throw new Error(text || response.statusText);
+        }
+        return response.json();
+      });
     }
 
-    function renderLog(body) {
-      const log = body.log || body;
-      const observations = Array.isArray(log.observations) ? log.observations : [];
-      const activities = Array.isArray(log.activities) ? log.activities : [];
-      output.innerHTML =
-        '<div class="summary-card">' +
-          '<div class="card-top">' +
-            '<div>' +
-              '<h3>Log saved to farm memory</h3>' +
-              '<div class="muted-text">' + escapeHtml(log.field_name || "Field") + ' - ' + escapeHtml(log.date || "today") + '</div>' +
-            '</div>' +
-            '<span class="chip">Field memory updated</span>' +
-          '</div>' +
-          '<div class="summary-grid">' +
-            '<div class="summary-item"><span>Activities</span>' + chips(activities.map((item) => item.duration_minutes ? item.type + " - " + item.duration_minutes + " min" : item.type)) + '</div>' +
-            '<div class="summary-item"><span>Observations</span>' + chips(observations.map((item) => item.signal || item.type)) + '</div>' +
-          '</div>' +
-          '<div><div class="muted-text" style="margin-bottom:6px;">Risk signals</div>' + chips(log.risk_signals) + '</div>' +
-          '<div class="muted-text">Memory summary: ' + escapeHtml(log.embedding_text || "Saved for future plans.") + '</div>' +
-        '</div>';
+    function todayIso() {
+      return new Date().toISOString().slice(0, 10);
     }
 
-    function renderAgentTrace(trace) {
-      const steps = Array.isArray(trace) ? trace : [];
-      if (!steps.length) return "";
-      return '<div class="summary-card">' +
-        '<div class="card-top">' +
-          '<div>' +
-            '<h3>Planning steps</h3>' +
-            '<div class="muted-text">Trellis shows what it checked before making the plan.</div>' +
-          '</div>' +
-          '<span class="chip">Live planning run</span>' +
-        '</div>' +
-        '<div class="trace">' + steps.map((step) =>
-          '<div class="trace-step">' +
-            '<strong>' + escapeHtml(plainStepName(step.step)) + '</strong>' +
-            '<span class="muted-text">' + escapeHtml(plainStepDetail(step.step)) + '</span>' +
-          '</div>'
-        ).join("") + '</div>' +
-      '</div>';
+    function compactId(value) {
+      if (!value) return "";
+      if (typeof value === "string") return value;
+      if (value.$oid) return value.$oid;
+      return String(value);
     }
 
-    function plainStepDetail(step) {
-      const value = String(step || "");
-      if (value === "Perceive") return "Read recent notes, crop signals, and unfinished work.";
-      if (value === "Remember") return "Looked for older notes that resemble today's problem.";
-      if (value === "Use tools") return "Checked field history and open jobs before answering.";
-      if (value === "Act") return "Drafted plan items the grower can approve.";
-      return "Checked farm context before planning.";
+    function safeArray(value) {
+      return Array.isArray(value) ? value : [];
     }
 
-    function plainStepName(step) {
-      const value = String(step || "");
-      if (value === "Perceive") return "Read today's situation";
-      if (value === "Remember") return "Remember similar issues";
-      if (value === "Use tools") return "Check the work list";
-      if (value === "Act") return "Draft the plan";
-      return "Planning step";
+    function priorityClass(value) {
+      return value === "high" ? "high" : value === "low" ? "low" : "medium";
     }
 
-    function renderMemoryMatches(matches) {
-      const memories = Array.isArray(matches) ? matches.slice(0, 3) : [];
-      if (!memories.length) return "";
-      return '<div class="summary-card">' +
-        '<div class="card-top">' +
-          '<div>' +
-            '<h3>Similar Past Notes</h3>' +
-            '<div class="muted-text">Older field notes Trellis remembered before planning.</div>' +
-          '</div>' +
-          '<span class="chip">Field memory</span>' +
-        '</div>' +
-        memories.map((memory) =>
-          '<div class="memory-row memory-card">' +
-            '<div class="card-top">' +
-              '<div><strong>' + escapeHtml(memory.field_name || "Field") + '</strong><div class="muted-text">' + escapeHtml(memory.date || "") + '</div></div>' +
-              '<span class="score">' + Math.max(0, Number(memory.score || 0)).toFixed(2) + ' similarity</span>' +
-            '</div>' +
-            '<div>' + escapeHtml(memory.raw_text || memory.embedding_text || "") + '</div>' +
-            chips(memory.risk_signals) +
-          '</div>'
-        ).join("") +
-      '</div>';
-    }
+    function App() {
+      const [fieldName, setFieldName] = useState("South Field");
+      const [date, setDate] = useState(todayIso());
+      const [rawText, setRawText] = useState(sampleLogs[0].text);
+      const [question, setQuestion] = useState("What should I do tomorrow?");
+      const [health, setHealth] = useState(null);
+      const [logs, setLogs] = useState([]);
+      const [tasks, setTasks] = useState([]);
+      const [recommendations, setRecommendations] = useState([]);
+      const [plan, setPlan] = useState(null);
+      const [runState, setRunState] = useState("idle");
+      const [activeReceipt, setActiveReceipt] = useState(0);
+      const [approvingId, setApprovingId] = useState("");
+      const [sprinklerApproved, setSprinklerApproved] = useState(false);
+      const [error, setError] = useState("");
+      const [turns, setTurns] = useState([
+        {
+          role: "agent",
+          title: "Agent standing by",
+          body: "Add a daily note, then let Trellis reorder tomorrow morning."
+        }
+      ]);
 
-    function renderReasoningSummary(items) {
-      const reasons = Array.isArray(items) ? items : [];
-      if (!reasons.length) return "";
-      return '<div class="summary-card">' +
-        '<div class="card-top">' +
-          '<div>' +
-            '<h3>Why This Plan</h3>' +
-            '<div class="muted-text">A short explanation a grower can review.</div>' +
-          '</div>' +
-          '<span class="chip">plain summary</span>' +
-        '</div>' +
-        '<ul class="reason-list">' + reasons.map((reason) => '<li>' + escapeHtml(plainSentence(reason)) + '</li>').join("") + '</ul>' +
-      '</div>';
-    }
+      useEffect(function() {
+        refreshState();
+      }, []);
 
-    function renderToolCalls(toolCalls) {
-      const calls = Array.isArray(toolCalls) ? toolCalls : [];
-      if (!calls.length) return "";
-      return '<div class="summary-card">' +
-        '<div class="card-top">' +
-          '<div>' +
-            '<h3>What Trellis Checked</h3>' +
-            '<div class="muted-text">The work Trellis did before drafting the plan.</div>' +
-          '</div>' +
-          '<span class="chip">live checks</span>' +
-        '</div>' +
-        calls.map((tool) =>
-          '<div class="memory-row">' +
-            '<div class="card-top"><strong>' + escapeHtml(plainToolName(tool.name || "check")) + '</strong><span class="muted-text">' + escapeHtml(plainSentence(plainToolResult(tool))) + '</span></div>' +
-            '<div class="muted-text">Completed before the plan was shown.</div>' +
-          '</div>'
-        ).join("") +
-      '</div>';
-    }
+      useEffect(function() {
+        const statusDot = document.getElementById("statusDot");
+        const statusText = document.getElementById("statusText");
+        const ready = Boolean(health && health.ok && health.mongo && health.mongo.ok);
+        if (statusDot) statusDot.classList.toggle("ready", ready);
+        if (statusText) statusText.textContent = ready ? "Live farm memory ready" : "Farm memory warming up";
+      }, [health]);
 
-    function renderPlan(body) {
-      latestRecommendations = Array.isArray(body.recommendations) ? body.recommendations : [];
-      if (!latestRecommendations.length) {
-        output.innerHTML =
-          '<div class="empty-state">' +
-            '<strong>No urgent recommendations.</strong>' +
-            '<span>Add a fresh log to update field memory and regenerate the plan.</span>' +
-          '</div>';
-        return;
+      useEffect(function() {
+        const receipts = safeArray(plan && plan.agent_receipts);
+        if (!receipts.length) return undefined;
+        setActiveReceipt(0);
+        const timer = window.setInterval(function() {
+          setActiveReceipt(function(index) {
+            return index >= receipts.length - 1 ? index : index + 1;
+          });
+        }, 760);
+        return function() {
+          window.clearInterval(timer);
+        };
+      }, [plan]);
+
+      const openTasks = useMemo(function() {
+        return tasks.filter(function(task) {
+          return task.status === "open";
+        });
+      }, [tasks]);
+
+      const visibleRecommendations = safeArray(plan && plan.recommendations).length
+        ? safeArray(plan && plan.recommendations)
+        : recommendations.slice(0, 4);
+
+      async function refreshState() {
+        try {
+          const results = await Promise.all([
+            api("/api/health"),
+            api("/api/tasks"),
+            api("/api/recommendations"),
+            api("/api/logs")
+          ]);
+          setHealth(results[0]);
+          setTasks(safeArray(results[1].tasks));
+          setRecommendations(safeArray(results[2].recommendations));
+          setLogs(safeArray(results[3].logs));
+        } catch (err) {
+          setError(err.message || String(err));
+        }
       }
 
-      const cards = latestRecommendations.map((rec, index) => {
-        const reasons = Array.isArray(rec.reasoning_summary) ? rec.reasoning_summary : [];
-        const recId = escapeHtml(rec._id || "");
-        const button = recId
-          ? '<button type="button" class="small-button" onclick="approveRecommendation(\\'' + recId + '\\')">Approve task</button>'
-          : '<span class="muted-text">Saved after refresh</span>';
+      async function runAgent() {
+        setError("");
+        setPlan(null);
+        setSprinklerApproved(false);
+        setRunState("saving");
+        setTurns(function(current) {
+          return [
+            {
+              role: "user",
+              title: "Daily field note",
+              body: rawText
+            }
+          ].concat(current).slice(0, 5);
+        });
 
-        return '<div class="plan-card">' +
-          '<div class="card-top">' +
-            '<div>' +
-              '<h3>' + escapeHtml(index + 1) + '. ' + escapeHtml(rec.title || "Field recommendation") + '</h3>' +
-              '<div class="muted-text">' + escapeHtml(rec.field_name || "Farm") + '</div>' +
-            '</div>' +
-            priorityBadge(rec.priority) +
-          '</div>' +
-          '<div>' + escapeHtml(rec.recommendation || "") + '</div>' +
-          '<ul class="reason-list">' + reasons.slice(0, 3).map((reason) => '<li>' + escapeHtml(plainSentence(reason)) + '</li>').join("") + '</ul>' +
-          '<div class="card-top"><span class="muted-text">Status: ' + escapeHtml((rec.status || "pending_approval").replaceAll("_", " ")) + '</span>' + button + '</div>' +
-        '</div>';
-      }).join("");
+        try {
+          await api("/api/logs", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+              farm_id: "farm_demo",
+              field_name: fieldName,
+              raw_text: rawText,
+              date: date
+            })
+          });
+          setRunState("thinking");
+          const body = await api("/api/agent/ask", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+              farm_id: "farm_demo",
+              question: question
+            })
+          });
+          setPlan(body);
+          setRunState("ready");
+          setTurns(function(current) {
+            return [
+              {
+                role: "agent",
+                title: "Tomorrow board updated",
+                body: body.answer || "The agent prepared tomorrow's plan."
+              }
+            ].concat(current).slice(0, 5);
+          });
+          await refreshState();
+        } catch (err) {
+          setRunState("idle");
+          setError(err.message || String(err));
+        }
+      }
 
-      output.innerHTML =
-        renderAgentTrace(body.agent_trace) +
-        renderToolCalls(body.tool_calls) +
-        renderMemoryMatches(body.memory_matches) +
-        renderReasoningSummary(body.reasoning_summary) +
-        '<div class="summary-card">' +
-          '<div class="card-top">' +
-            '<div>' +
-              '<h3>Tomorrow\\'s action plan</h3>' +
-              '<div class="muted-text">' + escapeHtml(body.target_date || "Next field day") + '</div>' +
-            '</div>' +
-            '<span class="chip">' + escapeHtml(latestRecommendations.length) + ' recommendations</span>' +
-          '</div>' +
-          '<div class="muted-text">' + escapeHtml(body.answer || "TrellisAI ranked the most important field work.") + '</div>' +
-        '</div>' +
-        cards;
-    }
+      async function approveRecommendation(rec) {
+        const id = compactId(rec && rec._id);
+        if (!id) return;
+        setError("");
+        setApprovingId(id);
+        try {
+          const body = await api("/api/recommendations/" + encodeURIComponent(id) + "/approve", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({})
+          });
+          const task = body.task && (body.task.task || body.task);
+          setTurns(function(current) {
+            return [
+              {
+                role: "agent",
+                title: "Crew job approved",
+                body: task && task.title ? task.title : "Approved work was added to the field board."
+              }
+            ].concat(current).slice(0, 5);
+          });
+          await refreshState();
+        } catch (err) {
+          setError(err.message || String(err));
+        } finally {
+          setApprovingId("");
+        }
+      }
 
-    function renderSnapshot(tasks, recs) {
-      const pending = (recs.recommendations || []).filter((rec) => rec.status !== "approved").slice(0, 3);
-      if (!pending.length) return;
-      output.innerHTML =
-        '<div class="summary-card">' +
-          '<div class="card-top">' +
-            '<div>' +
-              '<h3>Current farm memory</h3>' +
-              '<div class="muted-text">Recent recommendations are ready for grower review.</div>' +
-            '</div>' +
-            '<span class="chip">' + escapeHtml((tasks.tasks || []).filter((task) => task.status === "open").length) + ' open tasks</span>' +
-          '</div>' +
-        '</div>' +
-        pending.map((rec) =>
-          '<div class="plan-card">' +
-            '<div class="card-top"><h3>' + escapeHtml(rec.title) + '</h3>' + priorityBadge(rec.priority) + '</div>' +
-            '<div class="muted-text">' + escapeHtml(rec.field_name || "Farm") + '</div>' +
-            '<div>' + escapeHtml(rec.recommendation || "") + '</div>' +
-          '</div>'
-        ).join("");
-    }
+      function useSample(sample) {
+        setFieldName(sample.field);
+        setRawText(sample.text);
+      }
 
-    async function createLog() {
-      pushTurn("user", "Field log", document.getElementById("field").value + ": " + document.getElementById("log").value, []);
-      setWorking("Saving log", "Trellis is reading the note and updating field memory.");
-      try {
-        const body = await api("/api/logs", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            farm_id: "farm_demo",
-            field_name: document.getElementById("field").value,
-            raw_text: document.getElementById("log").value
+      return h(LayoutGroup, null,
+        h("div", { className: "agent-shell" },
+          h(AgentStage, {
+            plan: plan,
+            runState: runState,
+            runAgent: runAgent,
+            question: question,
+            setQuestion: setQuestion,
+            openTasks: openTasks,
+            logs: logs,
+            recommendations: recommendations
+          }),
+          h(ReceiptRail, {
+            plan: plan,
+            activeReceipt: activeReceipt,
+            runState: runState
           })
-        });
-        renderLog(body);
-        pushTurn("agent", "Saved field note", "Trellis understood the note, found the important signals, and saved it for future plans.", [
-          { name: "Understood the note" },
-          { name: "Saved to field memory" },
-          { name: "Prepared future recall" }
-        ]);
-        await loadState();
-      } catch (error) {
-        setError(error);
-      }
+        ),
+        h("div", { className: "workbench" },
+          h("div", { className: "stack" },
+            h(LogComposer, {
+              fieldName: fieldName,
+              setFieldName: setFieldName,
+              date: date,
+              setDate: setDate,
+              rawText: rawText,
+              setRawText: setRawText,
+              samples: sampleLogs,
+              useSample: useSample,
+              runAgent: runAgent,
+              runState: runState,
+              error: error
+            }),
+            h(TurnTape, { turns: turns }),
+            h(DemoVideo, null)
+          ),
+          h("div", { className: "stack" },
+            h(SprinklerPanel, {
+              plan: plan,
+              sprinklerApproved: sprinklerApproved,
+              setSprinklerApproved: setSprinklerApproved
+            }),
+            h(PlanCards, {
+              recommendations: visibleRecommendations,
+              approveRecommendation: approveRecommendation,
+              approvingId: approvingId
+            }),
+            h(LogHistory, { logs: logs })
+          )
+        )
+      );
     }
 
-    async function askAgent() {
-      pushTurn("user", "Question", document.getElementById("question").value, []);
-      setWorking("Building action plan", "Trellis is checking recent notes, similar past issues, and unfinished jobs.");
-      try {
-        const body = await api("/api/agent/ask", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            farm_id: "farm_demo",
-            question: document.getElementById("question").value
+    function AgentStage(props) {
+      const plan = props.plan;
+      const thoughts = safeArray(plan && plan.reasoning_summary);
+      const headline = plan ? "Trellis is driving tomorrow morning" : "Trellis is ready to run the farm board";
+      const answer = plan && plan.answer
+        ? plan.answer
+        : "Drop in a messy daily note. The agent reads it, remembers similar field days, edits the sprinkler plan, and queues work for approval.";
+      const running = props.runState === "saving" || props.runState === "thinking";
+      const runLabel = props.runState === "saving" ? "Saving note" : props.runState === "thinking" ? "Thinking" : "Run Trellis agent";
+      const approvalCount = safeArray(props.recommendations).length;
+      const stats = [
+        { label: "Logs", value: safeArray(props.logs).length },
+        { label: "Open jobs", value: safeArray(props.openTasks).length },
+        { label: "Approvals", value: approvalCount > 9 ? "9+" : approvalCount }
+      ];
+
+      return h(motion.section, {
+        className: "agent-stage",
+        initial: { opacity: 0, y: 18 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.52, ease: "easeOut" }
+      },
+        h("div", { className: "stage-grid" },
+          h("div", { className: "stage-copy" },
+            h("div", null,
+              h(motion.div, {
+                className: "agent-kicker",
+                initial: { opacity: 0, y: 8 },
+                animate: { opacity: 1, y: 0 },
+                transition: { delay: 0.08 }
+              }, h(Sparkles, { size: 16 }), "Live agent run"),
+              h(motion.h1, {
+                layout: true,
+                initial: { opacity: 0, y: 16 },
+                animate: { opacity: 1, y: 0 },
+                transition: { delay: 0.12, duration: 0.46 }
+              }, headline),
+              h(motion.p, {
+                className: "agent-answer",
+                key: answer,
+                initial: { opacity: 0, y: 10 },
+                animate: { opacity: 1, y: 0 },
+                transition: { delay: 0.18 }
+              }, answer)
+            ),
+            h("div", null,
+              h("div", { className: "run-row" },
+                h(motion.button, {
+                  className: "primary-action",
+                  type: "button",
+                  onClick: props.runAgent,
+                  disabled: running,
+                  whileHover: running ? {} : { y: -2, scale: 1.01 },
+                  whileTap: running ? {} : { scale: 0.98 }
+                }, running ? h(Activity, { size: 18 }) : h(Play, { size: 18 }), runLabel),
+                h(motion.label, {
+                  className: "primary-action ghost-action",
+                  whileHover: { y: -2 },
+                  htmlFor: "question"
+                }, h(Send, { size: 17 }), "Ask")
+              ),
+              h("label", { htmlFor: "question", style: { color: "rgba(255,255,255,0.78)" } }, "Agent prompt"),
+              h("input", {
+                id: "question",
+                value: props.question,
+                onChange: function(event) { props.setQuestion(event.target.value); },
+                style: { background: "rgba(255,255,255,0.94)" }
+              })
+            )
+          ),
+          h("div", { className: "stage-board" },
+            stats.map(function(stat, index) {
+              return h(motion.div, {
+                className: "thought-card",
+                key: stat.label,
+                initial: { opacity: 0, x: 20 },
+                animate: { opacity: 1, x: 0 },
+                transition: { delay: 0.16 + index * 0.08 }
+              }, h("span", null, stat.label), h("p", null, String(stat.value)));
+            }),
+            h(AnimatePresence, { mode: "popLayout" },
+              (thoughts.length ? thoughts : [
+                "The agent will choose a first field, explain why, and keep approvals in your hands.",
+                "Receipts show what changed: notes read, memories used, schedule edited, jobs queued."
+              ]).slice(0, 4).map(function(thought, index) {
+                return h(motion.div, {
+                  className: "thought-card",
+                  key: thought,
+                  layout: true,
+                  initial: { opacity: 0, x: 22 },
+                  animate: { opacity: 1, x: 0 },
+                  exit: { opacity: 0, x: 10 },
+                  transition: { delay: 0.24 + index * 0.06 }
+                }, h("span", null, "Thought " + String(index + 1)), h("p", null, thought));
+              })
+            )
+          )
+        )
+      );
+    }
+
+    function ReceiptRail(props) {
+      const receipts = safeArray(props.plan && props.plan.agent_receipts);
+      const fallback = [
+        { label: "Read the new log", detail: "Waiting for a daily field note.", state: "watch" },
+        { label: "Remembered past context", detail: "Ready to compare this note with similar field days.", state: "watch" },
+        { label: "Edited sprinkler schedule", detail: "Irrigation changes appear here after the run.", state: "approval" },
+        { label: "Queued approvals", detail: "Crew actions will wait for grower approval.", state: "approval" }
+      ];
+      const visible = receipts.length ? receipts : fallback;
+      const progress = visible.length ? ((props.activeReceipt + 1) / visible.length) * 100 : 0;
+
+      return h(motion.aside, {
+        className: "receipt-rail",
+        initial: { opacity: 0, y: 18 },
+        animate: { opacity: 1, y: 0 },
+        transition: { delay: 0.08, duration: 0.46 }
+      },
+        h("div", { className: "panel-title" },
+          h("h2", null, h(ClipboardCheck, { size: 18 }), "Action receipts"),
+          h("span", { className: "state-chip" }, props.runState === "thinking" ? "running" : receipts.length ? "ready" : "standby")
+        ),
+        h("div", { className: "receipt-list" },
+          visible.map(function(receipt, index) {
+            const active = receipts.length && index <= props.activeReceipt;
+            const className = "receipt-card " + (receipt.state || "done") + (active ? " active" : "");
+            return h(motion.div, {
+              className: className,
+              key: receipt.label + String(index),
+              initial: { opacity: 0, x: 16 },
+              animate: { opacity: 1, x: 0 },
+              transition: { delay: 0.05 + index * 0.08 },
+              whileHover: { y: -2 }
+            },
+              h("div", { className: "receipt-icon" }, active ? h(CheckCircle2, { size: 18 }) : h(Radio, { size: 18 })),
+              h("div", null, h("strong", null, receipt.label), h("p", null, receipt.detail))
+            );
           })
-        });
-        renderPlan(body);
-        pushTurn("agent", "Tomorrow's plan", (body.reasoning_summary || []).map(plainSentence).join(" "), body.tool_calls || []);
-        await loadState();
-      } catch (error) {
-        setError(error);
-      }
+        ),
+        h("div", { className: "receipt-progress", "aria-hidden": "true" },
+          h(motion.span, {
+            initial: { width: "0%" },
+            animate: { width: String(progress) + "%" },
+            transition: { duration: 0.42 }
+          })
+        )
+      );
     }
 
-    async function approveRecommendation(id) {
-      if (!id) return;
-      setWorking("Approving task", "Trellis is turning the approved plan item into a field job.");
-      try {
-        const body = await api("/api/recommendations/" + encodeURIComponent(id) + "/approve", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({})
-        });
-        const task = body.task && (body.task.task || body.task);
-        output.innerHTML =
-          '<div class="task-card">' +
-            '<div>' +
-              '<strong>' + escapeHtml(task.title || "Task created") + '</strong>' +
-              '<span class="muted-text">' + escapeHtml(task.field_name || "Farm") + ' - due ' + escapeHtml(task.due_date || "tomorrow") + '</span>' +
-            '</div>' +
-            priorityBadge(task.priority) +
-          '</div>';
-        pushTurn("agent", "Approved field job", "Trellis added the approved work to tomorrow's job list.", [
-          { name: "Marked plan approved" },
-          { name: "Saved to field memory" }
-        ]);
-        await loadState();
-      } catch (error) {
-        setError(error);
-      }
+    function LogComposer(props) {
+      const running = props.runState === "saving" || props.runState === "thinking";
+      return h(motion.section, {
+        className: "panel",
+        initial: { opacity: 0, y: 18 },
+        animate: { opacity: 1, y: 0 },
+        transition: { delay: 0.12 }
+      },
+        h("div", { className: "panel-title" },
+          h("h2", null, h(Sprout, { size: 18 }), "Daily log"),
+          h("span", { className: "state-chip" }, props.fieldName)
+        ),
+        h("label", { htmlFor: "fieldName" }, "Field"),
+        h("select", {
+          id: "fieldName",
+          value: props.fieldName,
+          onChange: function(event) { props.setFieldName(event.target.value); }
+        },
+          ["South Field", "North Field", "West Field"].map(function(field) {
+            return h("option", { key: field, value: field }, field);
+          })
+        ),
+        h("label", { htmlFor: "logDate" }, "Date"),
+        h("input", {
+          id: "logDate",
+          value: props.date,
+          onChange: function(event) { props.setDate(event.target.value); }
+        }),
+        h("label", { htmlFor: "rawText" }, "Grower note"),
+        h("textarea", {
+          id: "rawText",
+          value: props.rawText,
+          onChange: function(event) { props.setRawText(event.target.value); }
+        }),
+        h("div", { className: "sample-row" },
+          props.samples.map(function(sample) {
+            return h(motion.button, {
+              key: sample.name,
+              type: "button",
+              onClick: function() { props.useSample(sample); },
+              whileHover: { y: -2 },
+              whileTap: { scale: 0.98 }
+            }, sample.name);
+          })
+        ),
+        h("div", { className: "toolbar-row" },
+          h(motion.button, {
+            className: "primary-action",
+            type: "button",
+            onClick: props.runAgent,
+            disabled: running,
+            whileHover: running ? {} : { y: -2 },
+            whileTap: running ? {} : { scale: 0.98 }
+          }, running ? h(Activity, { size: 18 }) : h(Play, { size: 18 }), running ? "Running" : "Run agent")
+        ),
+        props.error ? h("div", { className: "error-box" }, props.error) : null
+      );
     }
 
-    async function loadState(renderCurrent = false) {
-      try {
-        const [health, fields, tasks, recs, logs] = await Promise.all([
-          api("/api/health"),
-          api("/api/fields"),
-          api("/api/tasks"),
-          api("/api/recommendations"),
-          api("/api/logs")
-        ]);
-        statusDot.classList.toggle("ready", Boolean(health.ok && health.mongo.ok));
-        statusText.textContent = health.mongo.ok ? "Live farm memory ready" : "Farm memory unavailable";
-        document.getElementById("fieldCount").textContent = fields.fields.length;
-        document.getElementById("logCount").textContent = logs.logs.length;
-        document.getElementById("taskCount").textContent = tasks.tasks.filter((task) => task.status === "open").length;
-        document.getElementById("recCount").textContent = recs.recommendations.length;
-        renderLogHistory(logs.logs);
-        if (renderCurrent) renderSnapshot(tasks, recs);
-      } catch (error) {
-        statusDot.classList.remove("ready");
-        statusText.textContent = "Farm memory unavailable";
-      }
+    function SprinklerPanel(props) {
+      const sprinkler = props.plan && props.plan.sprinkler_plan;
+      const before = sprinkler && sprinkler.before ? sprinkler.before : { start_time: "6:30 AM", duration_minutes: 25, mode: "standard morning cycle" };
+      const after = sprinkler && sprinkler.after ? sprinkler.after : { start_time: "5:15 AM", duration_minutes: 42, mode: "agent-adjusted moisture recovery", status: "ready for approval" };
+      const zone = sprinkler && sprinkler.zone ? sprinkler.zone : "South road edge / lateral 2";
+      const decision = sprinkler && sprinkler.decision ? sprinkler.decision : "The schedule change appears after the agent reads the daily note.";
+
+      return h(motion.section, {
+        className: "panel sprinkler-panel",
+        initial: { opacity: 0, y: 18 },
+        animate: { opacity: 1, y: 0 },
+        transition: { delay: 0.16 }
+      },
+        h("div", { className: "panel-title" },
+          h("h2", null, h(Droplets, { size: 18 }), "Smart sprinkler schedule"),
+          h("span", { className: props.sprinklerApproved ? "state-chip" : "approval-chip" },
+            props.sprinklerApproved ? "approved" : "ready for approval"
+          )
+        ),
+        h("div", { className: "sprinkler-layout" },
+          h("div", { className: "field-map" },
+            h(motion.div, {
+              className: "spray-line one",
+              animate: { opacity: [0.62, 1, 0.62], scaleX: [0.92, 1, 0.92] },
+              transition: { duration: 2.1, repeat: Infinity, ease: "easeInOut" }
+            }),
+            h(motion.div, {
+              className: "spray-line two",
+              animate: { opacity: [0.44, 0.95, 0.44], scaleX: [0.78, 1, 0.78] },
+              transition: { duration: 2.4, repeat: Infinity, ease: "easeInOut" }
+            }),
+            h(motion.div, {
+              className: "sprinkler-badge",
+              initial: { y: 14, opacity: 0 },
+              animate: { y: 0, opacity: 1 }
+            },
+              h("div", null, h("strong", null, zone), h("div", { className: "muted" }, decision)),
+              h(Droplets, { size: 22 })
+            )
+          ),
+          h("div", { className: "schedule-stack" },
+            h(ScheduleCard, { label: "Before", data: before }),
+            h(ScheduleCard, { label: "After", data: after, after: true }),
+            h(motion.button, {
+              className: props.sprinklerApproved ? "secondary-action" : "primary-action secondary-action",
+              type: "button",
+              onClick: function() { props.setSprinklerApproved(!props.sprinklerApproved); },
+              whileHover: { y: -2 },
+              whileTap: { scale: 0.98 }
+            }, props.sprinklerApproved ? h(Check, { size: 17 }) : h(Droplets, { size: 17 }), props.sprinklerApproved ? "Sprinkler edit approved" : "Approve sprinkler edit")
+          )
+        )
+      );
     }
 
-    loadState(true);
+    function ScheduleCard(props) {
+      const data = props.data || {};
+      return h(motion.div, {
+        className: "schedule-card" + (props.after ? " after" : ""),
+        layout: true,
+        initial: { opacity: 0, y: 10 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.3 }
+      },
+        h("small", null, props.label),
+        h("div", { className: "schedule-time" },
+          h("strong", null, data.start_time || "6:30 AM"),
+          h("span", null, String(data.duration_minutes || 25) + " min")
+        ),
+        h("div", { className: "muted" }, data.mode || "standard")
+      );
+    }
+
+    function PlanCards(props) {
+      const items = safeArray(props.recommendations).slice(0, 6);
+      return h(motion.section, {
+        className: "panel",
+        initial: { opacity: 0, y: 18 },
+        animate: { opacity: 1, y: 0 },
+        transition: { delay: 0.2 }
+      },
+        h("div", { className: "panel-title" },
+          h("h2", null, h(ListChecks, { size: 18 }), "Crew approvals"),
+          h("span", { className: "state-chip" }, String(items.length) + " ready")
+        ),
+        items.length ? h("div", { className: "plan-grid" },
+          items.map(function(rec, index) {
+            const id = compactId(rec._id);
+            const reasons = safeArray(rec.reasoning_summary).slice(0, 3);
+            return h(motion.article, {
+              className: "plan-card",
+              key: id || rec.title || String(index),
+              layout: true,
+              initial: { opacity: 0, y: 12 },
+              animate: { opacity: 1, y: 0 },
+              transition: { delay: index * 0.05 },
+              whileHover: { y: -3 }
+            },
+              h("div", { className: "plan-card-head" },
+                h("div", null, h("h3", null, rec.title || "Review field"), h("div", { className: "muted" }, rec.field_name || "Farm")),
+                h("span", { className: "priority-chip " + priorityClass(rec.priority) }, rec.priority || "medium")
+              ),
+              h("p", null, rec.recommendation || "Review this recommendation before assigning the crew."),
+              h("ul", { className: "reason-list" },
+                reasons.map(function(reason, reasonIndex) {
+                  return h("li", { key: reason + String(reasonIndex) }, h(CheckCircle2, { size: 15 }), h("span", null, reason));
+                })
+              ),
+              h(motion.button, {
+                className: "secondary-action",
+                type: "button",
+                onClick: function() { props.approveRecommendation(rec); },
+                disabled: props.approvingId === id || rec.status === "approved",
+                whileHover: rec.status === "approved" ? {} : { y: -2 },
+                whileTap: rec.status === "approved" ? {} : { scale: 0.98 }
+              }, rec.status === "approved" ? h(Check, { size: 16 }) : h(ClipboardCheck, { size: 16 }), rec.status === "approved" ? "Approved" : props.approvingId === id ? "Approving" : "Approve job")
+            );
+          })
+        ) : h("div", { className: "empty" }, "Run the agent to fill this board with approval-ready work.")
+      );
+    }
+
+    function LogHistory(props) {
+      const logs = safeArray(props.logs).slice(0, 12);
+      return h(motion.section, {
+        className: "panel",
+        initial: { opacity: 0, y: 18 },
+        animate: { opacity: 1, y: 0 },
+        transition: { delay: 0.24 }
+      },
+        h("div", { className: "panel-title" },
+          h("h2", null, h(History, { size: 18 }), "Log history"),
+          h("span", { className: "state-chip" }, String(logs.length) + " notes")
+        ),
+        logs.length ? h("div", { className: "log-history" },
+          logs.map(function(log, index) {
+            const signals = safeArray(log.risk_signals).slice(0, 5);
+            return h(motion.article, {
+              className: "log-card",
+              key: compactId(log._id) || String(index),
+              initial: { opacity: 0, y: 10 },
+              animate: { opacity: 1, y: 0 },
+              transition: { delay: index * 0.035 }
+            },
+              h("div", { className: "log-meta" },
+                h("strong", null, log.field_name || "Field"),
+                h("span", { className: "muted" }, log.date || "")
+              ),
+              h("p", null, log.raw_text || log.embedding_text || "No note text available."),
+              signals.length ? h("div", { className: "tag-row" },
+                signals.map(function(signal) {
+                  return h("span", { className: "tag", key: signal }, String(signal).replace(/_/g, " "));
+                })
+              ) : null
+            );
+          })
+        ) : h("div", { className: "empty" }, "Daily notes will appear here after the first run.")
+      );
+    }
+
+    function TurnTape(props) {
+      return h(motion.section, {
+        className: "panel",
+        initial: { opacity: 0, y: 18 },
+        animate: { opacity: 1, y: 0 },
+        transition: { delay: 0.2 }
+      },
+        h("div", { className: "panel-title" },
+          h("h2", null, h(Activity, { size: 18 }), "Multi-turn run"),
+          h("span", { className: "state-chip" }, "live")
+        ),
+        h("div", { className: "turn-tape" },
+          safeArray(props.turns).map(function(turn, index) {
+            return h(motion.article, {
+              className: "turn-card",
+              key: turn.title + String(index),
+              initial: { opacity: 0, x: -12 },
+              animate: { opacity: 1, x: 0 },
+              transition: { delay: index * 0.05 }
+            },
+              h("div", { className: "turn-avatar" }, turn.role === "user" ? h(Send, { size: 17 }) : h(Sparkles, { size: 17 })),
+              h("div", null, h("strong", null, turn.title), h("p", null, turn.body))
+            );
+          })
+        )
+      );
+    }
+
+    function DemoVideo() {
+      return h(motion.section, {
+        className: "panel",
+        initial: { opacity: 0, y: 18 },
+        animate: { opacity: 1, y: 0 },
+        transition: { delay: 0.24 }
+      },
+        h("div", { className: "panel-title" },
+          h("h2", null, h(Youtube, { size: 18 }), "Demo reel"),
+          h("a", { className: "muted", href: "https://youtu.be/EE6EDAMAjEI", target: "_blank", rel: "noreferrer" }, "Open on YouTube")
+        ),
+        h("div", { className: "video-frame" },
+          h("iframe", {
+            src: demoVideoUrl,
+            title: "TrellisAI demo video",
+            allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share",
+            allowFullScreen: true
+          })
+        )
+      );
+    }
+
+    createRoot(document.getElementById("agentApp")).render(h(App));
   </script>
 </body>
 </html>`;
