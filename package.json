@@ -1,0 +1,17 @@
+{
+  "name": "trellisai",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/api",
+    "apps/worker"
+  ],
+  "scripts": {
+    "build": "npm run build -w trellisai-api",
+    "dev:api": "npm run dev -w trellisai-api",
+    "dev:worker": "npm run dev -w trellisai-worker",
+    "seed": "npm run seed -w trellisai-api",
+    "indexes": "npm run indexes -w trellisai-api",
+    "deploy:worker": "npm run deploy -w trellisai-worker"
+  }
+}
