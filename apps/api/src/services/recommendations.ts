@@ -1,5 +1,6 @@
 import { ObjectId, type Db } from "mongodb";
 import type { Priority, Recommendation } from "../types.js";
+import { farmIsoDateOffset } from "./dates.js";
 import { aggregateFarmRisks } from "../tools/aggregateFarmRisks.js";
 import { retrieveFarmMemory, type MemoryMatch } from "../tools/retrieveFarmMemory.js";
 
@@ -178,9 +179,7 @@ export async function generateDailyPlan(db: Db, farmId: string, targetDate = tom
 }
 
 function tomorrowIsoDate(): string {
-  const date = new Date();
-  date.setDate(date.getDate() + 1);
-  return date.toISOString().slice(0, 10);
+  return farmIsoDateOffset(1);
 }
 
 function titleForRisk(fieldName: string, risk: string): string {

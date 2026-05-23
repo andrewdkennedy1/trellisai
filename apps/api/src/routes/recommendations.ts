@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import { asyncHandler, HttpError, parseObjectId } from "../http.js";
+import { farmIsoDateOffset } from "../services/dates.js";
 import { getDb } from "../services/mongo.js";
 import { createTask } from "../tools/createTask.js";
 
@@ -32,7 +33,7 @@ recommendationsRouter.post("/:id/approve", asyncHandler(async (req, res) => {
 
   await db.collection("recommendations").updateOne({ _id: id }, { $set: { status: "approved" } });
 
-  const dueDate = input.due_date || new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const dueDate = input.due_date || farmIsoDateOffset(1);
   const task = await createTask(db, {
     farm_id: recommendation.farm_id,
     field_name: recommendation.field_name,

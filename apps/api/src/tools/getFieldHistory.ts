@@ -1,5 +1,6 @@
 import type { Db } from "mongodb";
 import { HttpError } from "../http.js";
+import { farmIsoDateOffset } from "../services/dates.js";
 
 export interface GetFieldHistoryInput {
   farm_id: string;
@@ -17,9 +18,7 @@ export async function getFieldHistory(db: Db, input: GetFieldHistoryInput) {
     throw new HttpError(404, "Field not found");
   }
 
-  const since = new Date();
-  since.setDate(since.getDate() - input.days);
-  const sinceDate = since.toISOString().slice(0, 10);
+  const sinceDate = farmIsoDateOffset(-input.days);
 
   const [logs, tasks, recommendations] = await Promise.all([
     db.collection("logs").find({

@@ -328,6 +328,7 @@ function html() {
 
     .primary-btn {
       background: var(--accent-emerald);
+      border: 0;
       color: #060a07;
       font-weight: 700;
       border-radius: 8px;
@@ -349,6 +350,14 @@ function html() {
       opacity: 0.6;
       cursor: not-allowed;
       box-shadow: none;
+    }
+
+    .animate-spin {
+      animation: spin 0.9s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
     /* Steps Stepper visualizer */
@@ -877,11 +886,9 @@ function html() {
   <script type="module">
     import React, { useEffect, useMemo, useState } from "https://esm.sh/react@18.3.1";
     import { createRoot } from "https://esm.sh/react-dom@18.3.1/client";
-    import { AnimatePresence, LayoutGroup, motion } from "https://esm.sh/framer-motion@11.18.2?deps=react@18.3.1";
     import { 
-      Activity, Check, CheckCircle2, ClipboardCheck, Droplets, History, ListChecks, 
-      Play, Radio, Send, Sparkles, Sprout, Youtube, Cpu, Layers, Terminal, 
-      Database, ShieldAlert, AlertTriangle, ArrowRight, UserCheck, Trash2 
+      Activity, Check, CheckCircle2, ClipboardCheck, Cpu, Database, Droplets,
+      History, Layers, Play, ShieldAlert, Sprout, Terminal, UserCheck, Youtube
     } from "https://esm.sh/lucide-react@0.468.0?deps=react@18.3.1";
 
     const h = React.createElement;
@@ -916,7 +923,11 @@ function html() {
     }
 
     function todayIso() {
-      return new Date().toISOString().slice(0, 10);
+      const date = new Date();
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return year + "-" + month + "-" + day;
     }
 
     function compactId(value) {
@@ -1082,12 +1093,16 @@ function html() {
       }
 
       const activePresetIndex = useMemo(() => {
-        const thoughts = safeArray(plan && plan.reasoning_summary);
         if (runState === "saving") return 0;
         if (runState === "thinking") return 1;
         if (runState === "ready") return 3;
         return -1;
       }, [runState, plan]);
+      const sprinklerPlan = plan && plan.sprinkler_plan ? plan.sprinkler_plan : null;
+      const sprinklerBefore = sprinklerPlan && sprinklerPlan.before ? sprinklerPlan.before : {};
+      const sprinklerAfter = sprinklerPlan && sprinklerPlan.after ? sprinklerPlan.after : {};
+      const visibleRecommendations = recommendations.slice(0, 6);
+      const pendingCount = recommendations.filter(r => r.status !== "approved" && r.status !== "dismissed").length + (sprinklerPlan && !sprinklerApproved ? 1 : 0);
 
       return h("div", { className: "agent-layout" },
         // Left Column: Agent Console
@@ -1287,36 +1302,37 @@ function html() {
             h("div", { className: "panel-header" },
               h("h2", null, h(UserCheck, { size: 18 }), "Grower Approvals Queue"),
               h("span", { className: "badge badge-amber" }, 
-                String(recommendations.filter(r => r.status !== "approved").length + (sprinklerApproved ? 0 : 1)) + " Pending"
+                String(pendingCount) + " Pending"
               )
             ),
 
             h("div", { className: "approvals-deck" },
               // Smart Sprinkler Card
-              h("div", { className: "approval-card" },
+              sprinklerPlan && h("div", { className: "approval-card" },
                 h("div", { className: "card-top" },
                   h("div", { className: "card-title" },
                     h("h4", null, "Smart Sprinkler Schedule Change"),
-                    h("span", null, fieldName + " / Lateral 2")
+                    h("span", null, sprinklerPlan.zone || sprinklerPlan.controller || fieldName)
                   ),
                   h("span", { className: sprinklerApproved ? "badge badge-emerald" : "badge badge-amber" }, 
                     sprinklerApproved ? "approved" : "ready"
                   )
                 ),
                 h("div", { className: "card-body" },
-                  "The agent optimized tomorrow's water cycles to address low pressure and moisture requirements.",
+                  sprinklerPlan.decision || "The agent optimized tomorrow's water cycle and queued it for approval.",
                   h("div", { className: "comparison-grid", style: { marginTop: "12px" } },
                     h("div", { className: "compare-side" },
-                      h("strong", null, "Standard Morning"),
-                      h("p", null, "06:30 AM"),
-                      h("small", null, "25 minutes")
+                      h("strong", null, "Before"),
+                      h("p", null, sprinklerBefore.start_time || "6:30 AM"),
+                      h("small", null, String(sprinklerBefore.duration_minutes || 25) + " minutes")
                     ),
                     h("div", { className: "compare-side after-side" },
-                      h("strong", null, "Optimized Recovery"),
-                      h("p", null, "05:15 AM"),
-                      h("small", null, "42 minutes")
+                      h("strong", null, "After"),
+                      h("p", null, sprinklerAfter.start_time || "5:15 AM"),
+                      h("small", null, String(sprinklerAfter.duration_minutes || 42) + " minutes")
                     )
-                  )
+                  ),
+                  sprinklerPlan.reason ? h("div", { style: { marginTop: "8px" } }, sprinklerPlan.reason) : null
                 ),
                 h("div", null,
                   sprinklerApproved 
@@ -1332,7 +1348,7 @@ function html() {
                             setSprinklerApproved(true);
                             setTerminalThoughts(prev => [
                               ...prev,
-                              "[" + new Date().toLocaleTimeString() + "] APPROVED: Irrigation schedule optimized starting at 05:15 AM."
+                              "[" + new Date().toLocaleTimeString() + "] APPROVED: " + (sprinklerPlan.zone || "Irrigation zone") + " optimized starting at " + (sprinklerAfter.start_time || "5:15 AM") + "."
                             ]);
                           }
                         }, h(Droplets, { size: 16 }), "Deploy Irrigation Schedule")
@@ -1341,7 +1357,7 @@ function html() {
               ),
 
               // Recommendations / Crew tasks approvals
-              recommendations.length ? recommendations.map((rec, index) => {
+              visibleRecommendations.length ? visibleRecommendations.map((rec, index) => {
                 const id = compactId(rec._id);
                 const reasons = safeArray(rec.reasoning_summary).slice(0, 3);
                 const isApproved = rec.status === "approved";

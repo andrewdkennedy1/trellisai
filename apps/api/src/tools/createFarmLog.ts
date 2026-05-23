@@ -1,5 +1,6 @@
 import type { Db } from "mongodb";
 import { HttpError } from "../http.js";
+import { farmIsoDate } from "../services/dates.js";
 import { createEmbedding } from "../services/embeddings.js";
 import { extractFarmLog } from "../services/extraction.js";
 
@@ -27,7 +28,7 @@ export async function createFarmLog(db: Db, input: CreateFarmLogInput) {
     farm_id: input.farm_id,
     field_id: field._id,
     field_name: input.field_name,
-    date: input.date || new Date().toISOString().slice(0, 10),
+    date: input.date || farmIsoDate(),
     raw_text: input.raw_text,
     ...extracted,
     embedding,
